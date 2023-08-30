@@ -12,11 +12,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   input: {
-    backgroundColor: GlobalStyles.colors.primary100,
+    backgroundColor: GlobalStyles.colors.primary800,
     padding: 6,
     borderRadius: 6,
     fontSize: 18,
-    color: GlobalStyles.colors.primary700,
+    color: GlobalStyles.colors.primary100,
   },
   inputMultipline: {
     minHeight: 100,
