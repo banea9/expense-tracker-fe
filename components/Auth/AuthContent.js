@@ -44,6 +44,7 @@ const AuthContent = ({ isLogin, onAuthenticate }) => {
         email: !emailIsValid,
         password: !passwordIsValid,
         confirmPassword: !passwordIsValid || !passwordsAreEqual,
+        username: !usernameIsValid
       });
       return;
     }

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://10.15.8.197:3000/users";
+const API_URL = "http://172.23.128.1:3000/users";
 
 export const createUser = async (
   email,
