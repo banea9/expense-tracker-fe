@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
   rootContainer: {
     padding: 12,
     marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.primary500,
+    backgroundColor: GlobalStyles.colors.primary600,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   amountText: {
-    color: GlobalStyles.colors.primary500,
+    color: GlobalStyles.colors.primary600,
     fontWeight: "bold",
   },
   pressed: {

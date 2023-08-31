@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     padding: 24,
-    backgroundColor: GlobalStyles.colors.primary800,
+    backgroundColor: GlobalStyles.colors.primary700,
   },
   deletеBtn: {
     marginTop: 16,

@@ -1,18 +1,20 @@
-import AuthContent from "../components/Auth/AuthContent";
-import { useContext, useState } from "react";
-import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { login } from "../util/auth";
+import { useState } from "react";
+import { login } from "../../util/auth";
 import { Alert } from "react-native";
-import { AuthContext } from "../store/auth-context";
+import { useDispatch } from "react-redux";
+import { authenticate } from "../../store/auth";
+import AuthContent from "../../components/Auth/AuthContent";
+import LoadingOverlay from "../../components/UI/LoadingOverlay";
+
 function LoginScreen() {
   const [loading, setLoading] = useState(false);
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
 
   const loginHandler = async ({ email, password }) => {
     setLoading(true);
     try {
       const token = await login(email, password);
-      authCtx.authenticate(token);
+      dispatch(authenticate({ token }));
     } catch (error) {
       Alert.alert("Authentication failed", "Please check your credentials!");
       setLoading(false);
