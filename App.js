@@ -9,13 +9,12 @@ import { useEffect } from "react";
 import { store } from "./store/store";
 import { authenticate, logout } from "./store/auth";
 import ManageExpenses from "./screens/ManageExpenses";
-import RecentExpenses from "./screens/RecentExpenses";
 import AllExpenses from "./screens/AllExpenses";
 import IconButton from "./components/UI/IconButton";
 import LoginScreen from "./screens/auth/LoginScreen";
 import SignupScreen from "./screens/auth/SignupScreen";
-// import Profile from "./screens/Profile";
-// import Wallets from "./screens/Wallets";s
+import Wallets from "./screens/Wallets";
+import Expenses from "./screens/Expenses";
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -32,7 +31,7 @@ export default function App() {
           tabBarStyle: {
             backgroundColor: GlobalStyles.colors.primary700,
           },
-          tabBarActiveTintColor: GlobalStyles.colors.accent500,
+          tabBarActiveTintColor: GlobalStyles.colors.primary400,
           headerRight: ({ tintColor }) => (
             <IconButton
               icon="add"
@@ -46,13 +45,24 @@ export default function App() {
         })}
       >
         <Tabs.Screen
-          component={RecentExpenses}
+          component={Expenses}
           name="Expenses"
           options={{
             tabBarLabel: "Recent",
-            title: "Recent Expenses",
+            title: "Expenses",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="hourglass" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          component={Wallets}
+          name="Wallets"
+          options={{
+            tabBarLabel: "Wallets",
+            title: "Wallets",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="briefcase" color={color} size={size} />
             ),
           }}
         />
@@ -146,7 +156,7 @@ export default function App() {
 
     return (
       <NavigationContainer>
-        {isAuthenticated ? <AuthenticatedStack /> : <AuthStack />}
+        <AuthenticatedStack />
       </NavigationContainer>
     );
   };

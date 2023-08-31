@@ -6,6 +6,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
     backgroundColor: GlobalStyles.colors.primary400,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.primary400,
+    borderRadius: 14,
   },
   flat: {
     backgroundColor: "transparent",
@@ -15,12 +18,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   flatText: {
-    color: GlobalStyles.colors.primary200,
+    color: GlobalStyles.colors.white,
     textAlign: "center",
   },
   pressed: {
     opacity: 0.75,
-    backgroundColor: GlobalStyles.colors.primary100,
+    backgroundColor: GlobalStyles.colors.primary400,
     borderRadius: 4,
   },
 });
