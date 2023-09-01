@@ -15,6 +15,7 @@ import LoginScreen from "./screens/auth/LoginScreen";
 import SignupScreen from "./screens/auth/SignupScreen";
 import Wallets from "./screens/Wallets";
 import Expenses from "./screens/Expenses";
+import WalletForm from "./components/ManageWallet/WalletForm";
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -32,39 +33,49 @@ export default function App() {
             backgroundColor: GlobalStyles.colors.primary700,
           },
           tabBarActiveTintColor: GlobalStyles.colors.primary400,
-          headerRight: ({ tintColor }) => (
-            <IconButton
-              icon="add"
-              color={tintColor}
-              size={24}
-              onPress={() => {
-                navigation.navigate("ManageExpense");
-              }}
-            />
-          ),
         })}
       >
         <Tabs.Screen
           component={Expenses}
           name="Expenses"
-          options={{
+          options={({ navigation }) => ({
             tabBarLabel: "Recent",
             title: "Expenses",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="hourglass" color={color} size={size} />
             ),
-          }}
+            headerRight: ({ tintColor }) => (
+              <IconButton
+                icon="add"
+                color={tintColor}
+                size={24}
+                onPress={() => {
+                  navigation.navigate("ManageExpense");
+                }}
+              />
+            ),
+          })}
         />
         <Tabs.Screen
           component={Wallets}
           name="Wallets"
-          options={{
+          options={({ navigation }) => ({
             tabBarLabel: "Wallets",
             title: "Wallets",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="briefcase" color={color} size={size} />
             ),
-          }}
+            headerRight: ({ tintColor }) => (
+              <IconButton
+                icon="add"
+                color={tintColor}
+                size={24}
+                onPress={() => {
+                  navigation.navigate("ManageWallet");
+                }}
+              />
+            ),
+          })}
         />
         <Tabs.Screen
           component={AllExpenses}
@@ -130,6 +141,13 @@ export default function App() {
         <Stack.Screen
           name="ManageExpense"
           component={ManageExpenses}
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="ManageWallet"
+          component={WalletForm}
           options={{
             presentation: "modal",
           }}

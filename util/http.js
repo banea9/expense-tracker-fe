@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL =
-  "https://expense-tracker-native-6c8de-default-rtdb.europe-west1.firebasedatabase.app";
+const BACKEND_URL = "http://172.23.128.1:3000";
 
 export const httpStoreExpense = async (expenseData) => {
   const response = await axios.post(
@@ -37,4 +36,17 @@ export const httpUpdateExpense = (id, expenseData) => {
 
 export const httpDeleteExpense = (id) => {
   return axios.delete(`${BACKEND_URL}/expenses/${id}.json`);
+};
+
+export const httpAddWallet = async (walletData) => {
+  const response = await axios.post(`${BACKEND_URL}/wallets`, walletData);
+
+  console.log(response);
+  return response.data;
+};
+
+export const httpFetchWallet = async () => {
+  const response = await axios.get(`${BACKEND_URL}/wallets`);
+  console.log(response);
+  return response.data;
 };
