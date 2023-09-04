@@ -84,7 +84,7 @@ const ExpenseForm = ({
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
 
     if (!amountIsValid || !descriptionIsValid || !dateIsValid) {
-      //   Alert.alert("Invalid input", "Please check you input values");
+      Alert.alert("Invalid input", "Please check you input values");
       setInputValue((prevState) => {
         return {
           amount: { value: prevState.amount.value, isValid: amountIsValid },

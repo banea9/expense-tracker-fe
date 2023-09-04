@@ -1,8 +1,12 @@
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
-import Input from "./Input";
+import Input from "../ManageExpense/Input";
 import Button from "../../components/UI/Button";
 import { useState } from "react";
+import { httpAddWallet } from "../../util/http";
+import { addWallet } from "../../store/wallets";
+import ErrorOverlay from "../UI/ErrorOverlay";
+import LoadingOverlay from "../UI/LoadingOverlay";
 
 const styles = StyleSheet.create({
   form: {
@@ -43,39 +47,71 @@ const styles = StyleSheet.create({
   },
 });
 
-const WalletForm = ({ onCancel, onSubmit, submitBtnLabel }) => {
+const WalletForm = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
   const [inputValue, setInputValue] = useState({
-    name: "",
-    description: "",
+    name: { value: "", isValid: true },
+    creatorEmail: { value: "", isValid: true },
+    description: { value: "", isValid: true },
   });
+
+  const onCancel = () => {
+    navigation.goBack();
+  };
 
   const inputChangeHandler = (inputIdentifier, value) => {
     setInputValue((prevState) => {
       return {
         ...prevState,
-        [inputIdentifier]: value,
+        [inputIdentifier]: { value, isValid: true },
       };
     });
   };
 
-  const handleSubmit = () => {
-    const nameIsValid = inputValue.name.trim().length > 3;
-    const descriptionIsValid = inputValue?.description.trim().length > 10;
-
+  const handleSubmit = async () => {
+    const nameIsValid = inputValue?.name.value.trim().length > 3;
+    const descriptionIsValid = inputValue?.description.value.trim().length > 10;
     if (!nameIsValid || !descriptionIsValid) {
       Alert.alert(
         "Invalid input",
         "Name should be longer then 3 characters and description should be more then 10 characters. "
       );
+      setInputValue((prevState) => {
+        return {
+          name: { value: prevState.name.value, isValid: nameIsValid },
+          description: {
+            value: prevState.description.value,
+            isValid: descriptionIsValid,
+          },
+        };
+      });
       return;
     }
 
-    onSubmit(walletData);
+    setLoading(true);
+    const walletData = {
+      name: inputValue.name.value,
+      description: inputValue.description.value,
+    };
+    try {
+      const id = await httpAddWallet(walletData);
+      dispatch(addWallet({ ...walletData, id }));
+      navigation.goBack();
+    } catch (err) {
+      setError("Could not save wallet. Please try again later");
+      setLoading(false);
+    }
   };
 
-  const formIsInvalid = () =>
-    inputValue.name.trim().length > 3 ||
-    inputValue?.description.trim().length > 10;
+  if (error && !loading) {
+    return <ErrorOverlay message={error} />;
+  }
+
+  if (loading) {
+    return <LoadingOverlay/>;
+  }
 
   return (
     <View style={styles.form}>
@@ -87,7 +123,7 @@ const WalletForm = ({ onCancel, onSubmit, submitBtnLabel }) => {
           label="Name"
           textInputConfig={{
             onChangeText: inputChangeHandler.bind(this, "name"),
-            value: inputValue.name,
+            value: inputValue.name.value,
           }}
         />
         <Input
@@ -105,20 +141,15 @@ const WalletForm = ({ onCancel, onSubmit, submitBtnLabel }) => {
         textInputConfig={{
           multiline: true,
           onChangeText: inputChangeHandler.bind(this, "description"),
-          value: inputValue.description,
+          value: inputValue.description.value,
         }}
       />
-      {formIsInvalid() && (
-        <Text style={styles.errorMsg}>
-          Form is invalid - please check the entered data.
-        </Text>
-      )}
       <View style={styles.buttonsContainer}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
           Cancel
         </Button>
         <Button style={styles.button} onPress={handleSubmit}>
-          {submitBtnLabel}
+          Add
         </Button>
       </View>
     </View>

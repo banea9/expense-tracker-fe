@@ -10,11 +10,11 @@ const walletsSlice = createSlice({
       state.wallets = action.payload.reverse();
     },
     addWallet: (state, action) => {
-      const { description, amount, date } = action.payload;
+      const { description, name, id } = action.payload;
       state.wallets.unshift({
         description,
-        amount,
-        date,
+        name,
+        id,
       });
     },
     deleteWallet: (state, action) => {

@@ -24,7 +24,7 @@ export default function App() {
   const TabsNavigation = () => {
     return (
       <Tabs.Navigator
-        screenOptions={({ navigation }) => ({
+        screenOptions={() => ({
           headerStyle: {
             backgroundColor: GlobalStyles.colors.primary700,
           },
