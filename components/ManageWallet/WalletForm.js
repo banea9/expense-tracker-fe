@@ -1,12 +1,14 @@
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
-import Input from "../ManageExpense/Input";
-import Button from "../../components/UI/Button";
 import { useState } from "react";
 import { httpAddWallet } from "../../util/http";
 import { addWallet } from "../../store/wallets";
+import Input from "../ManageExpense/Input";
+import Button from "../../components/UI/Button";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
+import CustomPicker from "../UI/CustomPicker";
+import { categories } from "../../util/constants";
 
 const styles = StyleSheet.create({
   form: {
@@ -31,6 +33,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonsContainer: {
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -50,6 +53,8 @@ const styles = StyleSheet.create({
 const WalletForm = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [category, setCategory] = useState(false);
+  const [subcategory, setSubcategory] = useState(false);
 
   const [inputValue, setInputValue] = useState({
     name: { value: "", isValid: true },
@@ -110,7 +115,7 @@ const WalletForm = ({ navigation }) => {
   }
 
   if (loading) {
-    return <LoadingOverlay/>;
+    return <LoadingOverlay />;
   }
 
   return (
@@ -144,6 +149,27 @@ const WalletForm = ({ navigation }) => {
           value: inputValue.description.value,
         }}
       />
+      <CustomPicker
+        options={categories}
+        category={category}
+        subcategory={subcategory}
+        setCategory={setCategory}
+        setSubcategory={setSubcategory}
+      >
+        Category
+      </CustomPicker>
+      <CustomPicker
+        options={
+          categories?.filter((c) => c.value === category)[0]?.subcategories
+        }
+        category={category}
+        subcategory={subcategory}
+        setCategory={setCategory}
+        setSubcategory={setSubcategory}
+      >
+        Subcategory
+      </CustomPicker>
+
       <View style={styles.buttonsContainer}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
           Cancel
