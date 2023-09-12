@@ -8,18 +8,21 @@ const authSlice = createSlice({
     token: "",
     isAuthenticated: false,
     email: "",
+    username: "",
   },
   reducers: {
     authenticate: (state, action) => {
       AsyncStorage.setItem("auth-token", action.payload.token);
       state.token = action.payload.token;
       state.isAuthenticated = true;
-      state.email = jwt_decode(action.payload.token)?.email
+      state.email = jwt_decode(action.payload.token)?.email;
+      state.email = jwt_decode(action.payload.token)?.username;
     },
     logout: (state, _action) => {
       state.token = "";
       state.isAuthenticated = false;
       state.email = "";
+      state.username = "";
       AsyncStorage.removeItem("auth-token");
     },
   },

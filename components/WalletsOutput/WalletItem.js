@@ -8,15 +8,17 @@ const styles = StyleSheet.create({
     padding: 12,
     marginVertical: 8,
     backgroundColor: GlobalStyles.colors.primary800,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     borderRadius: 6,
     elevation: 3,
     shadowColor: GlobalStyles.colors.gray500,
     shadowRadius: 4,
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.4,
+  },
+  nameContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   textBase: {
     color: GlobalStyles.colors.white,
@@ -46,32 +48,33 @@ const styles = StyleSheet.create({
 const WalletItem = ({ wallet }) => {
   const navigation = useNavigation();
   const walletPressHandler = () => {
-
     // navigation.navigate("ManageExpense", {
     //   expenseId: wallet.id,
     // });
   };
-
-  const { description, name, creatorEmail, users, _id } = wallet;
+  const { description, name, creatorEmail, users, _id, lastModified } = wallet;
   console.log(wallet);
   return (
     <Pressable
-      onPress={() => console.log('pressed wallet ' + wallet._id)}
+      onPress={() => console.log("pressed wallet " + _id)}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View style={styles.rootContainer}>
-        <View>
-          <Text style={[styles.textBase, styles.name]}>{name}</Text>
-          <Text style={styles.textBase}>{creatorEmail}</Text>
-        </View>
-        <View>
-          <Text style={[styles.textBase, styles.name]}>{description}</Text>
-        </View>
-        <View>
-          <Text style={[styles.textBase, styles.name]}>
-            Wallet users: {users.join(", ")}
-          </Text>
-        </View>
+        <Text style={[styles.textBase, styles.name]}>Name: {name}</Text>
+        <Text style={[styles.textBase, styles.name]}>
+          Creator: {creatorEmail}
+        </Text>
+
+        <Text style={[styles.textBase, styles.name]}>
+          Wallet users: {users.join(", ")}
+        </Text>
+
+        <Text style={[styles.textBase, styles.name]}>
+          Description: {description}
+        </Text>
+        <Text style={[styles.textBase, styles.name]}>
+          Last Modified: {getFormattedDate(new Date(lastModified))}
+        </Text>
       </View>
     </Pressable>
   );
