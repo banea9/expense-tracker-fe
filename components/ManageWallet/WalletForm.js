@@ -7,8 +7,7 @@ import Input from "../ManageExpense/Input";
 import Button from "../../components/UI/Button";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
-import CustomPicker from "../UI/CustomPicker";
-import { categories } from "../../util/constants";
+import { useSelector, useDispatch } from "react-redux";
 
 const styles = StyleSheet.create({
   form: {
@@ -53,12 +52,11 @@ const styles = StyleSheet.create({
 const WalletForm = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [category, setCategory] = useState(false);
-  const [subcategory, setSubcategory] = useState(false);
-
+  const user = useSelector((state) => state.authState);
+  const dispatch = useDispatch()
   const [inputValue, setInputValue] = useState({
     name: { value: "", isValid: true },
-    creatorEmail: { value: "", isValid: true },
+    creatorEmail: { value: user.email, isValid: true },
     description: { value: "", isValid: true },
   });
 
@@ -101,7 +99,7 @@ const WalletForm = ({ navigation }) => {
       description: inputValue.description.value,
     };
     try {
-      const id = await httpAddWallet(walletData);
+      const id = await httpAddWallet(walletData, user.token);
       dispatch(addWallet({ ...walletData, id }));
       navigation.goBack();
     } catch (err) {
@@ -135,7 +133,7 @@ const WalletForm = ({ navigation }) => {
           style={styles.rowInput}
           label="Creator Email"
           textInputConfig={{
-            value: inputValue.creatorEmail,
+            value: inputValue.creatorEmail.value,
             editable: false,
           }}
         />
@@ -149,27 +147,6 @@ const WalletForm = ({ navigation }) => {
           value: inputValue.description.value,
         }}
       />
-      <CustomPicker
-        options={categories}
-        category={category}
-        subcategory={subcategory}
-        setCategory={setCategory}
-        setSubcategory={setSubcategory}
-      >
-        Category
-      </CustomPicker>
-      <CustomPicker
-        options={
-          categories?.filter((c) => c.value === category)[0]?.subcategories
-        }
-        category={category}
-        subcategory={subcategory}
-        setCategory={setCategory}
-        setSubcategory={setSubcategory}
-      >
-        Subcategory
-      </CustomPicker>
-
       <View style={styles.buttonsContainer}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
           Cancel

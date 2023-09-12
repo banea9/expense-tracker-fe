@@ -38,15 +38,22 @@ export const httpDeleteExpense = (id) => {
   return axios.delete(`${BACKEND_URL}/expenses/${id}.json`);
 };
 
-export const httpAddWallet = async (walletData) => {
-  const response = await axios.post(`${BACKEND_URL}/wallets`, walletData);
+export const httpAddWallet = async (walletData, token) => {
+  const response = await axios.post(`${BACKEND_URL}/wallets`, walletData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  console.log(response);
   return response.data;
 };
 
-export const httpFetchWallet = async () => {
-  const response = await axios.get(`${BACKEND_URL}/wallets`);
-  console.log(response);
+export const httpFetchWallet = async (token) => {
+  const response = await axios.get(`${BACKEND_URL}/wallets/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
   return response.data;
 };

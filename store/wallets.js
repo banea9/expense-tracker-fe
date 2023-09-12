@@ -7,7 +7,8 @@ const walletsSlice = createSlice({
   },
   reducers: {
     setWallets: (state, action) => {
-      state.wallets = action.payload.reverse();
+      const wallets = JSON.parse(JSON.stringify(action.payload))
+      state.wallets = wallets.reverse();
     },
     addWallet: (state, action) => {
       const { description, name, id } = action.payload;

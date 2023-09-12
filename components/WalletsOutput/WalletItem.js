@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
   rootContainer: {
     padding: 12,
     marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.primary600,
+    backgroundColor: GlobalStyles.colors.primary800,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -52,10 +52,11 @@ const WalletItem = ({ wallet }) => {
     // });
   };
 
-  const { description, name, creatorEmail, users } = wallet;
+  const { description, name, creatorEmail, users, _id } = wallet;
+  console.log(wallet);
   return (
     <Pressable
-      onPress={() => console.log('pressed wallet ' + wallet.id)}
+      onPress={() => console.log('pressed wallet ' + wallet._id)}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View style={styles.rootContainer}>
