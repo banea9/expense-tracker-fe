@@ -16,6 +16,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.4,
   },
+  activeWallet: {
+    borderColor: GlobalStyles.colors.primary400,
+    borderWidth: 5,
+  },
   nameContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -28,24 +32,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontWeight: "bold",
   },
-  //   amountContainer: {
-  //     paddingHorizontal: 4,
-  //     paddingVertical: 12,
-  //     backgroundColor: GlobalStyles.colors.white,
-  //     justifyContent: "center",
-  //     alignItems: "center",
-  //     minWidth: 80,
-  //   },
-  //   amountText: {
-  //     color: GlobalStyles.colors.primary600,
-  //     fontWeight: "bold",
-  //   },
   pressed: {
     opacity: 0.75,
   },
 });
 
-const WalletItem = ({ wallet }) => {
+const WalletItem = ({ wallet, activeWalletId }) => {
   const navigation = useNavigation();
   const walletPressHandler = () => {
     // navigation.navigate("ManageExpense", {
@@ -53,20 +45,24 @@ const WalletItem = ({ wallet }) => {
     // });
   };
   const { description, name, creatorEmail, users, _id, lastModified } = wallet;
-  console.log(wallet);
   return (
     <Pressable
       onPress={() => console.log("pressed wallet " + _id)}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <View style={styles.rootContainer}>
+      <View
+        style={[
+          styles.rootContainer,
+          activeWalletId === _id && styles.activeWallet,
+        ]}
+      >
         <Text style={[styles.textBase, styles.name]}>Name: {name}</Text>
         <Text style={[styles.textBase, styles.name]}>
           Creator: {creatorEmail}
         </Text>
 
         <Text style={[styles.textBase, styles.name]}>
-          Wallet users: {users.join(", ")}
+          Wallet users: {users.map((u) => u.username).join(", ")}
         </Text>
 
         <Text style={[styles.textBase, styles.name]}>

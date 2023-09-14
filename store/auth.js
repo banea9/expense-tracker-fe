@@ -9,6 +9,7 @@ const authSlice = createSlice({
     isAuthenticated: false,
     email: "",
     username: "",
+    activeWallet: ''
   },
   reducers: {
     authenticate: (state, action) => {
@@ -17,12 +18,14 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.email = jwt_decode(action.payload.token)?.email;
       state.email = jwt_decode(action.payload.token)?.username;
+      state.activeWallet = jwt_decode(action.payload.token)?.activeWallet._id;
     },
     logout: (state, _action) => {
       state.token = "";
       state.isAuthenticated = false;
       state.email = "";
       state.username = "";
+      state.activeWallet = "";
       AsyncStorage.removeItem("auth-token");
     },
   },

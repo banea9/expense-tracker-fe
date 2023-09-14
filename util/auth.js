@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_URL } from "./constants";
 
-const API_URL = "http://172.23.128.1:3000/users";
+const URL = `${API_URL}/users`;
 
 export const createUser = async (
   email,
@@ -8,7 +9,7 @@ export const createUser = async (
   confirmPassword,
   username
 ) => {
-  const response = await axios.post(`${API_URL}/create`, {
+  const response = await axios.post(`${URL}/create`, {
     email,
     password,
     confirmPassword,
@@ -19,7 +20,7 @@ export const createUser = async (
 };
 
 export const login = async (email, password) => {
-  const response = await axios.post(`${API_URL}`, {
+  const response = await axios.post(`${URL}`, {
     email,
     password,
   });

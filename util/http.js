@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_URL } from "./constants";
 
-const BACKEND_URL = "http://172.23.128.1:3000";
+const BACKEND_URL = API_URL;
 
 export const httpStoreExpense = async (expenseData) => {
   const response = await axios.post(

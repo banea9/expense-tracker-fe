@@ -33,7 +33,7 @@ const Wallets = () => {
       try {
         const wallets = await httpFetchWallet(user.token);
         dispatch(setWallets(wallets));
-        setError(false)
+        setError(false);
       } catch (err) {
         console.log(err);
         setError("Couldn't fetch wallets!");
@@ -61,11 +61,17 @@ const Wallets = () => {
   }
 
   const renderWallets = (itemData) => {
-    return <WalletItem wallet={itemData.item} />;
+    return (
+      <WalletItem
+        wallet={itemData.item}
+        key={itemData.item._id}
+        activeWalletId={user.activeWallet}
+      />
+    );
   };
 
   return (
-    <View style={styles.rootContainer }>
+    <View style={styles.rootContainer}>
       <FlatList
         data={wallets}
         keyExtractor={(item) => item.id}

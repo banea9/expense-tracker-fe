@@ -1,3 +1,4 @@
+export const API_URL = 'http://10.15.8.197:3000'
 export const categories = [
   {
     label: "Apartment",
