@@ -6,11 +6,11 @@ import ExpensesSummary from "./ExpensesSummary";
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    padding: 24,
+    paddingVertical: 20,
     backgroundColor: GlobalStyles.colors.primary700,
   },
   fallbackText: {
-    marginTop: 32,
+    marginTop: 22,
     color: GlobalStyles.colors.white,
     fontSize: 16,
     textAlign: "center",
