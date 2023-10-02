@@ -7,6 +7,7 @@ import { httpFetchWallet } from "../util/http";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import WalletItem from "../components/WalletsOutput/WalletItem";
+import { useNavigation } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -28,6 +29,7 @@ const Wallets = () => {
   const wallets = useSelector((state) => state.walletsState.wallets);
   const user = useSelector((state) => state.authState);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   useEffect(() => {
     const getWallets = async () => {
       try {
@@ -63,6 +65,7 @@ const Wallets = () => {
   const renderWallets = (itemData) => {
     return (
       <WalletItem
+        navigation={navigation}
         wallet={itemData.item}
         key={itemData.item._id}
         activeWalletId={user.activeWallet}
@@ -74,7 +77,7 @@ const Wallets = () => {
     <View style={styles.rootContainer}>
       <FlatList
         data={wallets}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={renderWallets}
       />
     </View>

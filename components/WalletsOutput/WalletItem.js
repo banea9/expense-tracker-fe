@@ -40,14 +40,14 @@ const styles = StyleSheet.create({
 const WalletItem = ({ wallet, activeWalletId }) => {
   const navigation = useNavigation();
   const walletPressHandler = () => {
-    // navigation.navigate("ManageExpense", {
-    //   expenseId: wallet.id,
-    // });
+    navigation.navigate("EditWallet", {
+      wallet: wallet,
+    });
   };
   const { description, name, creatorEmail, users, _id, lastModified } = wallet;
   return (
     <Pressable
-      onPress={() => console.log("pressed wallet " + _id)}
+      onPress={walletPressHandler}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View

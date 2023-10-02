@@ -34,9 +34,11 @@ const styles = StyleSheet.create({
 const Input = ({ label, style, textInputConfig, invalid }) => {
   return (
     <View style={[styles.inputContainer, style]}>
-      <Text style={[styles.label, invalid && styles.invalidLabel]}>
-        {label}
-      </Text>
+      {label && (
+        <Text style={[styles.label, invalid && styles.invalidLabel]}>
+          {label}
+        </Text>
+      )}
       <TextInput
         style={[
           styles.input,

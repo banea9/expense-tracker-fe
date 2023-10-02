@@ -16,6 +16,7 @@ import SignupScreen from "./screens/auth/SignupScreen";
 import Wallets from "./screens/Wallets";
 import Expenses from "./screens/Expenses";
 import WalletForm from "./components/ManageWallet/WalletForm";
+import EditWallet from "./components/ManageWallet/EditWallet";
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -147,6 +148,13 @@ const AuthenticatedStack = () => {
       <Stack.Screen
         name="ManageWallet"
         component={WalletForm}
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="EditWallet"
+        component={EditWallet}
         options={{
           presentation: "modal",
         }}

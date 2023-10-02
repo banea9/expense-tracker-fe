@@ -1,4 +1,30 @@
-export const API_URL = 'http://10.15.8.197:3000'
+import { GlobalStyles } from "../constants/styles";
+
+export const API_URL = "http://172.22.240.1:3000";
+
+export const radioButtonsOptions = [
+  {
+    id: 1,
+    label: "Add User",
+    value: "add",
+    color: GlobalStyles.colors.primary400,
+    labelStyle: {
+      color: GlobalStyles.colors.white,
+    },
+  },
+  {
+    id: 2,
+    label: "Remove User",
+    value: "remove",
+    color: GlobalStyles.colors.primary400,
+    labelStyle: {
+      color: GlobalStyles.colors.white,
+    },
+  },
+];
+
+export const emailRegex =
+  /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/gm;
 export const categories = [
   {
     label: "Apartment",

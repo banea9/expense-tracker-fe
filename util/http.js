@@ -49,12 +49,72 @@ export const httpAddWallet = async (walletData, token) => {
   return response.data;
 };
 
+export const httpUpdateWallet = async (walletData, token) => {
+  // const response = await axios.post(`${BACKEND_URL}/wallets`, walletData, {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // });
+  // return response.data;
+};
+
 export const httpFetchWallet = async (token) => {
   const response = await axios.get(`${BACKEND_URL}/wallets/user`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  
+
+  return response.data;
+};
+
+export const httpAddUserToWallet = async (walletData, token) => {
+  const { id, userEmail } = walletData;
+  const updateWalletUser = {
+    userEmail,
+  };
+  const response = await axios.patch(
+    `${BACKEND_URL}/wallets/${id}/addUser`,
+    updateWalletUser,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const httpRemoveUserFromWallet = async (walletData, token) => {
+  const { id, userEmail } = walletData;
+  const updateWalletUser = {
+    userEmail,
+  };
+  const response = await axios.patch(
+    `${BACKEND_URL}/wallets/${id}/removeUser`,
+    updateWalletUser,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const httpSetActiveWallet = async (walletId, email, token) => {
+  console.log(walletId);
+  const response = await axios.patch(
+    `${BACKEND_URL}/users/${walletId}/activeWallet`,
+    { email },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  console.log("setActiveWallet:", response.data);
   return response.data;
 };

@@ -1,5 +1,6 @@
 export const getFormattedDate = (date) => {
-  return date.toISOString().substring(0, 10);
+  const isoStringDateArr = date.toISOString().substring(0, 10).split('-')
+  return `${isoStringDateArr[2]}.${isoStringDateArr[1]}.${isoStringDateArr[0]}`;
 };
 
 export const getDateMinusDays = (date, days) => {

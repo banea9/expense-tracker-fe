@@ -7,7 +7,7 @@ const walletsSlice = createSlice({
   },
   reducers: {
     setWallets: (state, action) => {
-      const wallets = JSON.parse(JSON.stringify(action.payload))
+      const wallets = JSON.parse(JSON.stringify(action.payload));
       state.wallets = wallets.reverse();
     },
     addWallet: (state, action) => {
@@ -33,6 +33,16 @@ const walletsSlice = createSlice({
         ...action.payload.wallet,
       };
     },
+    manipulateWalletUser: (state, action) => {
+      const id = action.payload.wallet._id;
+      const findedwalletIndex = state.wallets.findIndex((e) => e._id === id);
+      const walletUsers = action.payload.wallet?.users;
+      walletUsers;
+      state.wallets[findedwalletIndex] = {
+        ...state.wallets[findedwalletIndex],
+        users: walletUsers,
+      };
+    },
   },
 });
 
@@ -40,5 +50,6 @@ export const setWallets = walletsSlice.actions.setWallets;
 export const addWallet = walletsSlice.actions.addWallet;
 export const deleteWallet = walletsSlice.actions.deleteWallet;
 export const updateWallet = walletsSlice.actions.updateWallet;
+export const manipulateWalletUser = walletsSlice.actions.manipulateWalletUser;
 
 export default walletsSlice.reducer;

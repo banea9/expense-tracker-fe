@@ -9,7 +9,7 @@ const authSlice = createSlice({
     isAuthenticated: false,
     email: "",
     username: "",
-    activeWallet: ''
+    activeWallet: "",
   },
   reducers: {
     authenticate: (state, action) => {
@@ -17,7 +17,7 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.email = jwt_decode(action.payload.token)?.email;
-      state.email = jwt_decode(action.payload.token)?.username;
+      state.username = jwt_decode(action.payload.token)?.username;
       state.activeWallet = jwt_decode(action.payload.token)?.activeWallet._id;
     },
     logout: (state, _action) => {
@@ -28,10 +28,14 @@ const authSlice = createSlice({
       state.activeWallet = "";
       AsyncStorage.removeItem("auth-token");
     },
+    setUserActiveWallet: (state, action) => {
+      state.activeWallet = action.payload.walletId;
+    },
   },
 });
 
 export const authenticate = authSlice.actions.authenticate;
 export const logout = authSlice.actions.logout;
+export const setUserActiveWallet = authSlice.actions.setUserActiveWallet;
 
 export default authSlice.reducer;
