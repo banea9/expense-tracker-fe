@@ -4,10 +4,12 @@ import Input from "./Input";
 import Button from "../../components/UI/Button";
 import { useState } from "react";
 import { getFormattedDate } from "../../util/date";
+import { Dropdown } from "react-native-element-dropdown";
+import { categories } from "../../util/constants";
 
 const styles = StyleSheet.create({
   form: {
-    marginTop: 40,
+    marginTop: 20,
   },
   title: {
     marginVertical: 20,
@@ -26,6 +28,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonsContainer: {
+    marginTop: 20,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -39,6 +42,35 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 8,
   },
+  dropdown: {
+    height: 50,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 6,
+    borderColor: GlobalStyles.colors.primary400,
+    paddingHorizontal: 8,
+    marginVertical: 8,
+    marginHorizontal: 4,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: GlobalStyles.colors.white,
+  },
+  invalidDropdown: {
+    borderColor: GlobalStyles.colors.error500
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: GlobalStyles.colors.white,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
 });
 
 const ExpenseForm = ({
@@ -49,19 +81,26 @@ const ExpenseForm = ({
 }) => {
   const [inputValue, setInputValue] = useState({
     amount: {
-      value: defaultExpense ? defaultExpense.amount.toString() : "",
+      value: defaultExpense ? defaultExpense?.amount.toString() : "",
       isValid: true,
     },
     date: {
-      value: defaultExpense ? getFormattedDate(defaultExpense.date) : "",
+      value: defaultExpense ? getFormattedDate(defaultExpense?.date) : "",
       isValid: true,
     },
     description: {
-      value: defaultExpense ? defaultExpense.description : "",
+      value: defaultExpense ? defaultExpense?.description : "",
       isValid: true,
+    },
+    category: {
+      value: defaultExpense ? defaultExpense?.category : "", isValid: true,
+    },
+    subcategory: {
+      value: defaultExpense ? defaultExpense?.subcategory : "",isValid: true,
     },
   });
 
+  const [subcategories, setSubcategories] = useState([]);
   const inputChangeHandler = (inputIdentifier, value) => {
     setInputValue((prevState) => {
       return {
@@ -71,28 +110,44 @@ const ExpenseForm = ({
     });
   };
 
+  const handleDropdownSelection = async (name, value, subcategories) => {
+    await inputChangeHandler(name, value);
+    if (subcategories) setSubcategories(subcategories);
+  };
+
   const handleSubmit = () => {
     const expenseData = {
-      amount: +inputValue.amount.value,
-      date: new Date(inputValue.date.value),
-      description: inputValue.description.value,
+      amount: +inputValue.amount?.value,
+      date: new Date(inputValue.date?.value),
+      description: inputValue.description?.value,
+      category: inputValue.category?.value,
+      subcategory: inputValue.subcategory?.value,
     };
 
     const amountIsValid =
       !isNaN(expenseData?.amount) && expenseData?.amount > 0;
     const descriptionIsValid = expenseData.description.trim().length > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
-
-    if (!amountIsValid || !descriptionIsValid || !dateIsValid) {
+    const categoryIsValid = !!expenseData.category;
+    const subcategoryIsValid = !!expenseData.subcategory;
+    if (
+      !amountIsValid ||
+      !descriptionIsValid ||
+      !dateIsValid ||
+      !categoryIsValid ||
+      !subcategoryIsValid
+    ) {
       Alert.alert("Invalid input", "Please check you input values");
       setInputValue((prevState) => {
         return {
-          amount: { value: prevState.amount.value, isValid: amountIsValid },
-          date: { value: prevState.date.value, isValid: dateIsValid },
+          amount: { value: prevState.amount?.value, isValid: amountIsValid },
+          date: { value: prevState.date?.value, isValid: dateIsValid },
           description: {
-            value: prevState.description.value,
+            value: prevState.description?.value,
             isValid: descriptionIsValid,
           },
+          category: { value: prevState.category?.value, isValid: categoryIsValid },
+          subcategory: { value: prevState.subcategory?.value, isValid: subcategoryIsValid },
         };
       });
       return;
@@ -101,6 +156,8 @@ const ExpenseForm = ({
     onSubmit(expenseData);
   };
 
+  console.log(inputValue);
+
   const formIsInvalid = () =>
     !inputValue.amount.isValid ||
     !inputValue.date.isValid ||
@@ -108,7 +165,6 @@ const ExpenseForm = ({
 
   return (
     <View style={styles.form}>
-      <Text style={styles.title}>Your Expense</Text>
       <View style={styles.rowInputContainer}>
         <Input
           style={styles.rowInput}
@@ -117,7 +173,7 @@ const ExpenseForm = ({
           textInputConfig={{
             keyboardType: "decimal-pad",
             onChangeText: inputChangeHandler.bind(this, "amount"),
-            value: inputValue.amount.value,
+            value: inputValue.amount?.value,
           }}
         />
         <Input
@@ -128,7 +184,7 @@ const ExpenseForm = ({
             placeholder: "YYYY-MM-DD",
             maxLength: 10,
             onChangeText: inputChangeHandler.bind(this, "date"),
-            value: inputValue.date.value,
+            value: inputValue.date?.value,
           }}
         />
       </View>
@@ -138,9 +194,45 @@ const ExpenseForm = ({
         textInputConfig={{
           multiline: true,
           onChangeText: inputChangeHandler.bind(this, "description"),
-          value: inputValue.description.value,
+          value: inputValue.description?.value,
         }}
       />
+      <Dropdown
+        style={[styles.dropdown, !inputValue.category?.isValid && styles.invalidDropdown]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        searchPlaceholder="Search categories..."
+        placeholder='Select category'
+        labelField="label"
+        valueField="value"
+        data={categories}
+        search
+        onChange={(item) =>
+          handleDropdownSelection("category", item.value, item.subcategories)
+        }
+        maxHeight={300}
+        value={inputValue.category?.value}
+      />
+      {subcategories.length > 0 && (
+        <Dropdown
+          style={[styles.dropdown, !inputValue.subcategory?.isValid && styles.invalidDropdown]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          searchPlaceholder="Search subcategories..."
+          placeholder='Select subcategory'
+          labelField="label"
+          valueField="value"
+          data={subcategories}
+          search
+          onChange={(item) =>
+            handleDropdownSelection("subcategory", item.value)
+          }
+          maxHeight={300}
+          value={inputValue.subcategory?.value}
+        />
+      )}
       {formIsInvalid() && (
         <Text style={styles.errorMsg}>
           Form is invalid - please check the entered data.

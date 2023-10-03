@@ -11,11 +11,13 @@ const RecentExpenses = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(true);
   const expenses = useSelector((state) => state.expensesState.expenses);
+  const user = useSelector((state) => state.authState);
   const dispatch = useDispatch();
+
   useEffect(() => {
     const getExenses = async () => {
       try {
-        const expenses = await httpFetchExpense();
+        const expenses = await httpFetchExpense(user.token);
         dispatch(setExpenses(expenses));
       } catch (err) {
         setError("Couldn't fetch expenses!");
@@ -26,9 +28,8 @@ const RecentExpenses = () => {
     getExenses();
   }, []);
 
-
   if (error && !loading) {
-    return <ErrorOverlay message={error}/>;
+    return <ErrorOverlay message={error} />;
   }
 
   if (loading) {

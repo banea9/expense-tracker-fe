@@ -9,7 +9,6 @@ import { useEffect } from "react";
 import { store } from "./store/store";
 import { authenticate, logout } from "./store/auth";
 import ManageExpenses from "./screens/ManageExpenses";
-import AllExpenses from "./screens/AllExpenses";
 import IconButton from "./components/UI/IconButton";
 import LoginScreen from "./screens/auth/LoginScreen";
 import SignupScreen from "./screens/auth/SignupScreen";
@@ -17,11 +16,15 @@ import Wallets from "./screens/Wallets";
 import Expenses from "./screens/Expenses";
 import WalletForm from "./components/ManageWallet/WalletForm";
 import EditWallet from "./components/ManageWallet/EditWallet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Profile from "./screens/Profile";
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 
 const TabsNavigation = () => {
+  const dispatch = useDispatch();
+
   return (
     <Tabs.Navigator
       screenOptions={{
@@ -78,13 +81,21 @@ const TabsNavigation = () => {
         })}
       />
       <Tabs.Screen
-        component={AllExpenses}
+        component={Profile}
         name="AllExpenses"
         options={{
-          tabBarLabel: "All Expenses",
-          title: "All Expenses",
+          tabBarLabel: "Profile",
+          title: "Profile",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar" color={color} size={size} />
+            <Ionicons name="person" color={color} size={size} />
+          ),
+          headerRight: ({ tintColor }) => (
+            <IconButton
+              icon="exit"
+              color={tintColor}
+              size={24}
+              onPress={() => dispatch(logout())}
+            />
           ),
         }}
       />
@@ -114,8 +125,6 @@ const AuthStack = () => {
 };
 
 const AuthenticatedStack = () => {
-  const dispatch = useDispatch();
-
   return (
     <Stack.Navigator
       screenOptions={{
@@ -123,14 +132,6 @@ const AuthenticatedStack = () => {
           backgroundColor: GlobalStyles.colors.primary700,
         },
         headerTintColor: GlobalStyles.colors.white,
-        headerRight: ({ tintColor }) => (
-          <IconButton
-            icon="exit"
-            color={tintColor}
-            size={24}
-            onPress={() => dispatch(logout())}
-          />
-        ),
       }}
     >
       <Stack.Screen

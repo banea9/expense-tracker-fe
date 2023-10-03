@@ -13,22 +13,16 @@ export const httpStoreExpense = async (expenseData) => {
   return id;
 };
 
-export const httpFetchExpense = async () => {
-  const response = await axios.get(`${BACKEND_URL}/expenses.json`);
+export const httpFetchExpense = async (token) => {
+  const response = await axios.get(`${BACKEND_URL}/expenses`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  const expenses = [];
+  console.log("expenses: ", response.data);
 
-  for (const key in response.data) {
-    const expenseObj = {
-      id: key,
-      amount: response.data[key].amount,
-      date: new Date(response.data[key].date),
-      description: response.data[key].description,
-    };
-    expenses.push(expenseObj);
-  }
-
-  return expenses;
+  return response.data;
 };
 
 export const httpUpdateExpense = (id, expenseData) => {
@@ -105,7 +99,6 @@ export const httpRemoveUserFromWallet = async (walletData, token) => {
 };
 
 export const httpSetActiveWallet = async (walletId, email, token) => {
-  console.log(walletId);
   const response = await axios.patch(
     `${BACKEND_URL}/users/${walletId}/activeWallet`,
     { email },
@@ -115,6 +108,6 @@ export const httpSetActiveWallet = async (walletId, email, token) => {
       },
     }
   );
-  console.log("setActiveWallet:", response.data);
+
   return response.data;
 };

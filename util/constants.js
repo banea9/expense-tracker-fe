@@ -1,6 +1,6 @@
 import { GlobalStyles } from "../constants/styles";
 
-export const API_URL = "http://172.22.240.1:3000";
+export const API_URL = "http://10.15.8.197:3000";
 
 export const radioButtonsOptions = [
   {
