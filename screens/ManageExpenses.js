@@ -31,12 +31,12 @@ const styles = StyleSheet.create({
 const ManageExpenses = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
   const expenseId = route.params?.expenseId;
   const dispatch = useDispatch();
 
+  const userState = useSelector((state) => state.authState);
   const selectedExpense = useSelector((state) =>
-    state.expensesState.expenses.find((el) => el.id === expenseId)
+    state.expensesState.expenses.find((el) => el._id === expenseId)
   );
 
   const cancelHandler = () => {
@@ -45,6 +45,7 @@ const ManageExpenses = ({ route, navigation }) => {
 
   const confirmHandler = async (expenseData) => {
     setLoading(true);
+
     try {
       if (expenseId) {
         dispatch(
@@ -55,13 +56,32 @@ const ManageExpenses = ({ route, navigation }) => {
         );
         await httpUpdateExpense(expenseId, expenseData);
       } else {
-        const id = await httpStoreExpense(expenseData);
-        dispatch(addExpense({ ...expenseData, id }));
+        const res = await httpStoreExpense(expenseData, userState.token);
+        const {
+          _id,
+          amount,
+          category,
+          subcategory,
+          lastModified,
+          user,
+          wallet,
+        } = res;
+        const expense = {
+          _id,
+          amount,
+          category,
+          subcategory,
+          lastModified,
+          user: user._id,
+          wallet: wallet._id,
+        };
+        dispatch(addExpense(expense));
       }
       navigation.goBack();
     } catch (err) {
+      console.log(err);
       setError("Could not save expense. Please try again later");
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -74,8 +94,8 @@ const ManageExpenses = ({ route, navigation }) => {
   const deleteExpenseHandler = async () => {
     setLoading(true);
     try {
-      dispatch(deleteExpense({ id: expenseId }));
-      await httpDeleteExpense(expenseId);
+      const res = await httpDeleteExpense(expenseId, userState.token);
+      dispatch(deleteExpense({ id: res._id }));
       navigation.goBack();
     } catch (err) {
       setError("Could not delete expense. Please try again later");

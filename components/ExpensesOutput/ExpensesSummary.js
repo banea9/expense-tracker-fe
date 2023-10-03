@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 
 const ExpensesSummary = ({ periodName, expenses }) => {
   const expensesSum = expenses.reduce((sum, expense) => {
-    return (sum += expense.amount);
+    return (sum += +expense.amount);
   }, 0);
 
   return (

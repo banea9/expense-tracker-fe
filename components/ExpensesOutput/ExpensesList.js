@@ -10,7 +10,7 @@ const ExpensesList = ({ expenses }) => {
     <View>
       <FlatList
         data={expenses}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={renderExpenses}
       />
     </View>

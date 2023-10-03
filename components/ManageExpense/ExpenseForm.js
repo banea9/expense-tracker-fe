@@ -6,6 +6,7 @@ import { useState } from "react";
 import { getFormattedDate } from "../../util/date";
 import { Dropdown } from "react-native-element-dropdown";
 import { categories } from "../../util/constants";
+import { useSelector } from "react-redux";
 
 const styles = StyleSheet.create({
   form: {
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.white,
   },
   invalidDropdown: {
-    borderColor: GlobalStyles.colors.error500
+    borderColor: GlobalStyles.colors.error500,
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -79,13 +80,16 @@ const ExpenseForm = ({
   submitBtnLabel,
   defaultExpense,
 }) => {
+  const user = useSelector((state) => state.authState);
   const [inputValue, setInputValue] = useState({
     amount: {
       value: defaultExpense ? defaultExpense?.amount.toString() : "",
       isValid: true,
     },
-    date: {
-      value: defaultExpense ? getFormattedDate(defaultExpense?.date) : "",
+    lastModified: {
+      value: defaultExpense
+        ? getFormattedDate(defaultExpense?.lastModified)
+        : "",
       isValid: true,
     },
     description: {
@@ -93,14 +97,21 @@ const ExpenseForm = ({
       isValid: true,
     },
     category: {
-      value: defaultExpense ? defaultExpense?.category : "", isValid: true,
+      value: defaultExpense ? defaultExpense?.category : "",
+      isValid: true,
     },
     subcategory: {
-      value: defaultExpense ? defaultExpense?.subcategory : "",isValid: true,
+      value: defaultExpense ? defaultExpense?.subcategory : "",
+      isValid: true,
     },
   });
 
-  const [subcategories, setSubcategories] = useState([]);
+  const selectedCategory = categories.find(
+    (el) => el.value === inputValue.category.value?.toLowerCase()
+  );
+  const [subcategories, setSubcategories] = useState(
+    selectedCategory ? selectedCategory.subcategories : []
+  );
   const inputChangeHandler = (inputIdentifier, value) => {
     setInputValue((prevState) => {
       return {
@@ -118,22 +129,24 @@ const ExpenseForm = ({
   const handleSubmit = () => {
     const expenseData = {
       amount: +inputValue.amount?.value,
-      date: new Date(inputValue.date?.value),
+      lastModified: new Date(inputValue.lastModified?.value),
       description: inputValue.description?.value,
       category: inputValue.category?.value,
       subcategory: inputValue.subcategory?.value,
+      wallet: user.activeWallet,
     };
 
     const amountIsValid =
       !isNaN(expenseData?.amount) && expenseData?.amount > 0;
-    const descriptionIsValid = expenseData.description.trim().length > 0;
-    const dateIsValid = expenseData.date.toString() !== "Invalid Date";
+    const descriptionIsValid = expenseData.description?.trim().length > 0;
+    const lastModifiedIsValid =
+      expenseData.lastModified.toString() !== "Invalid Date";
     const categoryIsValid = !!expenseData.category;
     const subcategoryIsValid = !!expenseData.subcategory;
     if (
       !amountIsValid ||
       !descriptionIsValid ||
-      !dateIsValid ||
+      !lastModifiedIsValid ||
       !categoryIsValid ||
       !subcategoryIsValid
     ) {
@@ -141,13 +154,22 @@ const ExpenseForm = ({
       setInputValue((prevState) => {
         return {
           amount: { value: prevState.amount?.value, isValid: amountIsValid },
-          date: { value: prevState.date?.value, isValid: dateIsValid },
+          lastModified: {
+            value: prevState.lastModified?.value,
+            isValid: lastModifiedIsValid,
+          },
           description: {
             value: prevState.description?.value,
             isValid: descriptionIsValid,
           },
-          category: { value: prevState.category?.value, isValid: categoryIsValid },
-          subcategory: { value: prevState.subcategory?.value, isValid: subcategoryIsValid },
+          category: {
+            value: prevState.category?.value,
+            isValid: categoryIsValid,
+          },
+          subcategory: {
+            value: prevState.subcategory?.value,
+            isValid: subcategoryIsValid,
+          },
         };
       });
       return;
@@ -156,11 +178,9 @@ const ExpenseForm = ({
     onSubmit(expenseData);
   };
 
-  console.log(inputValue);
-
   const formIsInvalid = () =>
     !inputValue.amount.isValid ||
-    !inputValue.date.isValid ||
+    !inputValue.lastModified.isValid ||
     !inputValue.description.isValid;
 
   return (
@@ -178,13 +198,13 @@ const ExpenseForm = ({
         />
         <Input
           style={styles.rowInput}
-          invalid={!inputValue.date.isValid}
+          invalid={!inputValue.lastModified.isValid}
           label="Date"
           textInputConfig={{
             placeholder: "YYYY-MM-DD",
             maxLength: 10,
-            onChangeText: inputChangeHandler.bind(this, "date"),
-            value: inputValue.date?.value,
+            onChangeText: inputChangeHandler.bind(this, "lastModified"),
+            value: inputValue.lastModified?.value,
           }}
         />
       </View>
@@ -198,12 +218,15 @@ const ExpenseForm = ({
         }}
       />
       <Dropdown
-        style={[styles.dropdown, !inputValue.category?.isValid && styles.invalidDropdown]}
+        style={[
+          styles.dropdown,
+          !inputValue.category?.isValid && styles.invalidDropdown,
+        ]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         searchPlaceholder="Search categories..."
-        placeholder='Select category'
+        placeholder="Select category"
         labelField="label"
         valueField="value"
         data={categories}
@@ -212,16 +235,19 @@ const ExpenseForm = ({
           handleDropdownSelection("category", item.value, item.subcategories)
         }
         maxHeight={300}
-        value={inputValue.category?.value}
+        value={inputValue.category?.value.toLowerCase()}
       />
       {subcategories.length > 0 && (
         <Dropdown
-          style={[styles.dropdown, !inputValue.subcategory?.isValid && styles.invalidDropdown]}
+          style={[
+            styles.dropdown,
+            !inputValue.subcategory?.isValid && styles.invalidDropdown,
+          ]}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           inputSearchStyle={styles.inputSearchStyle}
           searchPlaceholder="Search subcategories..."
-          placeholder='Select subcategory'
+          placeholder="Select subcategory"
           labelField="label"
           valueField="value"
           data={subcategories}
@@ -230,7 +256,7 @@ const ExpenseForm = ({
             handleDropdownSelection("subcategory", item.value)
           }
           maxHeight={300}
-          value={inputValue.subcategory?.value}
+          value={inputValue.subcategory?.value.toLowerCase()}
         />
       )}
       {formIsInvalid() && (

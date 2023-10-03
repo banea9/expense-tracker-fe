@@ -1,5 +1,6 @@
 export const getFormattedDate = (date) => {
-  const isoStringDateArr = date.toISOString().substring(0, 10).split('-')
+  const convertedDate = new Date(date);
+  const isoStringDateArr = convertedDate.toISOString().substring(0, 10).split('-')
   return `${isoStringDateArr[2]}.${isoStringDateArr[1]}.${isoStringDateArr[0]}`;
 };
 

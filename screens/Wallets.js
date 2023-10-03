@@ -37,7 +37,6 @@ const Wallets = () => {
         dispatch(setWallets(wallets));
         setError(false);
       } catch (err) {
-        console.log(err);
         setError("Couldn't fetch wallets!");
       }
       setLoading(false);

@@ -10,15 +10,17 @@ const expensesSlice = createSlice({
       state.expenses = action.payload.reverse();
     },
     addExpense: (state, action) => {
-      const { description, amount, date, id, category, subcategory } =
+      const { description, amount, lastModified, _id, category, subcategory, user, wallet } =
         action.payload;
       state.expenses.unshift({
-        id,
+        _id,
         description,
         amount,
-        date,
+        lastModified,
         category,
         subcategory,
+        user,
+        wallet
       });
     },
     deleteExpense: (state, action) => {

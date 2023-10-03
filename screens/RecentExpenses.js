@@ -9,7 +9,7 @@ import { httpFetchExpense } from "../util/http";
 
 const RecentExpenses = () => {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(true);
+  const [error, setError] = useState(false);
   const expenses = useSelector((state) => state.expensesState.expenses);
   const user = useSelector((state) => state.authState);
   const dispatch = useDispatch();
@@ -18,6 +18,7 @@ const RecentExpenses = () => {
     const getExenses = async () => {
       try {
         const expenses = await httpFetchExpense(user.token);
+
         dispatch(setExpenses(expenses));
       } catch (err) {
         setError("Couldn't fetch expenses!");
@@ -39,7 +40,8 @@ const RecentExpenses = () => {
   const recentExpenses = expenses?.filter((e) => {
     const today = new Date();
     const date7DaysAgo = getDateMinusDays(today, 7);
-    return e.date > date7DaysAgo;
+
+    return new Date(e.lastModified) > date7DaysAgo;
   });
   return (
     <ExpensesOutput

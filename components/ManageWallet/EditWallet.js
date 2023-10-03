@@ -141,9 +141,7 @@ const EditWallet = ({ route, navigation }) => {
     try {
       const res = await httpSetActiveWallet(_id, user.email, user.token);
       dispatch(setUserActiveWallet({ walletId: res._id }));
-      console.log('user.activeWallet after', user.activeWallet)
     } catch (e) {
-      console.log(e.message);
       setError(e.message);
     }
   };

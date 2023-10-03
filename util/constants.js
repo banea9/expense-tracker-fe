@@ -103,7 +103,7 @@ export const categories = [
     value: "self improvement",
     subcategories: [
       { label: "Courses", value: "courses" },
-      { label: "Certificates", value: "Certificates" },
+      { label: "Certificates", value: "certificates" },
       { label: "Books", value: "books" },
       { label: "Other", value: "other-self-improvement" },
     ],

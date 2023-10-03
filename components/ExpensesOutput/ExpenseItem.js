@@ -2,12 +2,13 @@ import { Pressable, View, Text, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate } from "../../util/date";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
 const styles = StyleSheet.create({
   rootContainer: {
     padding: 12,
     marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.primary600,
+    backgroundColor: GlobalStyles.colors.primary800,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
   },
   textBase: {
-    color: GlobalStyles.colors.primary50,
+    color: GlobalStyles.colors.white,
   },
   description: {
     fontSize: 16,
@@ -29,13 +30,13 @@ const styles = StyleSheet.create({
   amountContainer: {
     paddingHorizontal: 4,
     paddingVertical: 12,
-    backgroundColor: GlobalStyles.colors.white,
+    backgroundColor: GlobalStyles.colors.primary400,
     justifyContent: "center",
     alignItems: "center",
     minWidth: 80,
   },
   amountText: {
-    color: GlobalStyles.colors.primary600,
+    color: GlobalStyles.colors.white,
     fontWeight: "bold",
   },
   pressed: {
@@ -44,14 +45,17 @@ const styles = StyleSheet.create({
 });
 
 const ExpenseItem = ({ expense }) => {
+  const user = useSelector((state) => state.authState);
   const navigation = useNavigation();
   const expensePressHandler = () => {
     navigation.navigate("ManageExpense", {
-      expenseId: expense.id
+      expenseId: expense._id,
     });
   };
 
-  const { description, date, amount } = expense;
+  const capitalizeWord = (word) => word.charAt(0).toUpperCase() + word.slice(1);
+
+  const { category, subcategory, lastModified, amount } = expense;
   return (
     <Pressable
       onPress={expensePressHandler}
@@ -60,12 +64,14 @@ const ExpenseItem = ({ expense }) => {
       <View style={styles.rootContainer}>
         <View>
           <Text style={[styles.textBase, styles.description]}>
-            {description}
+            {capitalizeWord(category)}, {capitalizeWord(subcategory)}
           </Text>
-          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
+          <Text style={styles.textBase}>
+            {getFormattedDate(lastModified)}, by {user.username}
+          </Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amountText}>{amount.toFixed(2)}</Text>
+          <Text style={styles.amountText}>{Number(amount).toFixed(2)}</Text>
         </View>
       </View>
     </Pressable>
