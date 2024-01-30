@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, Text } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalStyles } from "../constants/styles";
 import { setWallets } from "../store/wallets";
@@ -55,9 +55,11 @@ const Wallets = () => {
 
   if (wallets.length === 0) {
     return (
-      <Text style={styles.fallbackText}>
-        You are not part of any wallet at this moment.
-      </Text>
+      <View style={styles.rootContainer}>
+        <Text style={styles.fallbackText}>
+          You are not part of any wallet at this moment.
+        </Text>
+      </View>
     );
   }
 

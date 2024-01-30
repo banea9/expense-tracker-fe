@@ -27,9 +27,9 @@ const walletsSlice = createSlice({
     },
     updateWallet: (state, action) => {
       const id = action.payload.id;
-      const findedwalletIndex = state.wallets.findIndex((e) => e.id === id);
-      state.wallets[findedwalletIndex] = {
-        ...state.wallets[findedwalletIndex],
+      const findedWalletIndex = state.wallets.findIndex((e) => e.id === id);
+      state.wallets[findedWalletIndex] = {
+        ...state.wallets[findedWalletIndex],
         ...action.payload.wallet,
       };
     },

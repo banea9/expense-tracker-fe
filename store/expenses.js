@@ -10,8 +10,16 @@ const expensesSlice = createSlice({
       state.expenses = action.payload.reverse();
     },
     addExpense: (state, action) => {
-      const { description, amount, lastModified, _id, category, subcategory, user, wallet } =
-        action.payload;
+      const {
+        description,
+        amount,
+        lastModified,
+        _id,
+        category,
+        subcategory,
+        user,
+        wallet,
+      } = action.payload;
       state.expenses.unshift({
         _id,
         description,
@@ -20,7 +28,7 @@ const expensesSlice = createSlice({
         category,
         subcategory,
         user,
-        wallet
+        wallet,
       });
     },
     deleteExpense: (state, action) => {
@@ -32,7 +40,7 @@ const expensesSlice = createSlice({
     },
     updateExpense: (state, action) => {
       const id = action.payload.id;
-      const findedExpenseIndex = state.expenses.findIndex((e) => e.id === id);
+      const findedExpenseIndex = state.expenses.findIndex((e) => e._id === id);
       state.expenses[findedExpenseIndex] = {
         ...state.expenses[findedExpenseIndex],
         ...action.payload.expense,

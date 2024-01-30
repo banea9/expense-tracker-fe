@@ -16,17 +16,17 @@ function SignupScreen() {
   }) => {
     setLoading(true);
     try {
-      const isSuccessfull = await createUser(
+      const isSuccessful = await createUser(
         email,
         password,
         confirmPassword,
         username
       );
-      if (isSuccessfull) {
+      if (isSuccessful) {
         navigation.replace("Login");
       }
     } catch (error) {
-      Alert.alert("Sign up failed", "Error occured. Please try again");
+      Alert.alert("Sign up failed", "Error occurred. Please try again");
       setLoading(false);
     }
   };

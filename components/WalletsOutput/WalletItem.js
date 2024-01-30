@@ -62,7 +62,7 @@ const WalletItem = ({ wallet, activeWalletId }) => {
         </Text>
 
         <Text style={[styles.textBase, styles.name]}>
-          Wallet users: {users.map((u) => u.username).join(", ")}
+          Wallet users: {users?.map((u) => u.username).join(", ")}
         </Text>
 
         <Text style={[styles.textBase, styles.name]}>

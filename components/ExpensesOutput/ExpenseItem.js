@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
 });
 
 const ExpenseItem = ({ expense }) => {
-  const user = useSelector((state) => state.authState);
+  const userState = useSelector((state) => state.authState);
   const navigation = useNavigation();
   const expensePressHandler = () => {
     navigation.navigate("ManageExpense", {
@@ -67,7 +67,7 @@ const ExpenseItem = ({ expense }) => {
             {capitalizeWord(category)}, {capitalizeWord(subcategory)}
           </Text>
           <Text style={styles.textBase}>
-            {getFormattedDate(lastModified)}, by {user.username}
+            {getFormattedDate(lastModified)}, by {userState.username}
           </Text>
         </View>
         <View style={styles.amountContainer}>

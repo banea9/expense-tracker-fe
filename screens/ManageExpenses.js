@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalStyles } from "../constants/styles";
 import { deleteExpense, updateExpense, addExpense } from "../store/expenses";
+import DatePicker from "react-native-date-picker";
 import IconButton from "../components/UI/IconButton";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 import {
@@ -32,6 +33,7 @@ const ManageExpenses = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const expenseId = route.params?.expenseId;
+
   const dispatch = useDispatch();
 
   const userState = useSelector((state) => state.authState);
@@ -48,13 +50,23 @@ const ManageExpenses = ({ route, navigation }) => {
 
     try {
       if (expenseId) {
+        const res = await httpUpdateExpense(
+          {
+            id: expenseId,
+            ...expenseData,
+          },
+          userState.token
+        );
+        console.log("response: ", res);
         dispatch(
           updateExpense({
             id: expenseId,
-            expense: expenseData,
+            expense: {
+              id: expenseId,
+              ...expenseData,
+            },
           })
         );
-        await httpUpdateExpense(expenseId, expenseData);
       } else {
         const res = await httpStoreExpense(expenseData, userState.token);
         const {

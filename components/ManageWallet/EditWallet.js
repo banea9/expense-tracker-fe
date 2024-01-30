@@ -11,6 +11,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { useState } from "react";
 import {
   httpAddUserToWallet,
+  httpEditWallet,
   httpRemoveUserFromWallet,
   httpSetActiveWallet,
   httpUpdateWallet,
@@ -209,9 +210,10 @@ const EditWallet = ({ route, navigation }) => {
     setLoading(false);
   };
 
-  const handleSubmit = async () => {
+  const handleEditWallet = async () => {
     const nameIsValid = inputValue?.name.value.trim().length > 3;
     const descriptionIsValid = inputValue?.description.value.trim().length > 10;
+    console.log(name, description);
     if (!nameIsValid || !descriptionIsValid) {
       Alert.alert(
         "Invalid input",
@@ -230,23 +232,23 @@ const EditWallet = ({ route, navigation }) => {
           },
         };
       });
-      return;
     }
 
     setLoading(true);
     const walletData = {
       name: inputValue.name.value,
       description: inputValue.description.value,
+      creatorEmail: user.email,
       isActive: inputValue.isActive.value,
     };
     try {
-      const id = await httpUpdateWallet(walletData, user.token);
-      dispatch(updateWallet({ ...walletData, id }));
+      const id = await httpEditWallet(_id, walletData, user.token);
+      dispatch(updateWallet({ wallet: walletData, id }));
       navigation.goBack();
     } catch (err) {
       setError("Could not save wallet. Please try again later");
-      setLoading(false);
     }
+    setLoading(false);
   };
   if (error && !loading) {
     return <ErrorOverlay message={error} />;
@@ -347,7 +349,7 @@ const EditWallet = ({ route, navigation }) => {
             <Button style={styles.button} mode="flat" onPress={onCancel}>
               Cancel
             </Button>
-            <Button style={styles.button} onPress={handleSubmit}>
+            <Button style={styles.button} onPress={handleEditWallet}>
               Save
             </Button>
           </View>

@@ -18,7 +18,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.email = jwt_decode(action.payload.token)?.email;
       state.username = jwt_decode(action.payload.token)?.username;
-      state.activeWallet = jwt_decode(action.payload.token)?.activeWallet._id;
+      state.activeWallet = jwt_decode(action.payload.token)?.activeWallet?._id;
     },
     logout: (state, _action) => {
       state.token = "";

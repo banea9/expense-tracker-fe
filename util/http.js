@@ -21,15 +21,25 @@ export const httpFetchExpense = async (token) => {
   return response.data;
 };
 
-export const httpUpdateExpense = (id, expenseData) => {
-  return axios.put(`${BACKEND_URL}/expenses/${id}.json`, expenseData);
+export const httpUpdateExpense = async (expenseData, token) => {
+  const response = await axios.patch(
+    `${BACKEND_URL}/expenses/${expenseData.id}`,
+    expenseData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
 };
 
 export const httpDeleteExpense = (id, token) => {
   return axios.delete(`${BACKEND_URL}/expenses/${id}/delete`, {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 };
 
@@ -102,6 +112,20 @@ export const httpSetActiveWallet = async (walletId, email, token) => {
   const response = await axios.patch(
     `${BACKEND_URL}/users/${walletId}/activeWallet`,
     { email },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const httpEditWallet = async (walletId, walletData, token) => {
+  const response = await axios.patch(
+    `${BACKEND_URL}/wallets/${walletId}`,
+    walletData,
     {
       headers: {
         Authorization: `Bearer ${token}`,

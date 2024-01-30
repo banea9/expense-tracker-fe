@@ -18,6 +18,8 @@ import WalletForm from "./components/ManageWallet/WalletForm";
 import EditWallet from "./components/ManageWallet/EditWallet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profile from "./screens/Profile";
+import { View } from "react-native";
+import ExpensesFilter from "./components/ManageExpense/ExpenseFilter";
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -42,20 +44,30 @@ const TabsNavigation = () => {
         component={Expenses}
         name="Expenses"
         options={({ navigation }) => ({
-          tabBarLabel: "Recent",
+          tabBarLabel: "Expenses",
           title: "Expenses",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="hourglass" color={color} size={size} />
           ),
           headerRight: ({ tintColor }) => (
-            <IconButton
-              icon="add"
-              color={tintColor}
-              size={24}
-              onPress={() => {
-                navigation.navigate("ManageExpense");
-              }}
-            />
+            <View style={{flexDirection: 'row'}}>
+              <IconButton
+                icon="add"
+                color={tintColor}
+                size={24}
+                onPress={() => {
+                  navigation.navigate("ManageExpense");
+                }}
+              />
+              <IconButton
+                icon="funnel"
+                color={tintColor}
+                size={24}
+                onPress={() => {
+                  navigation.navigate("FilterExpenses");
+                }}
+              />
+            </View>
           ),
         })}
       />
@@ -142,6 +154,13 @@ const AuthenticatedStack = () => {
       <Stack.Screen
         name="ManageExpense"
         component={ManageExpenses}
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="FilterExpenses"
+        component={ExpensesFilter}
         options={{
           presentation: "modal",
         }}
