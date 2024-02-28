@@ -34,7 +34,7 @@ const expensesSlice = createSlice({
     deleteExpense: (state, action) => {
       const id = action.payload.id;
       const updatableExpenseIndex = state.expenses.findIndex(
-        (expense) => expense.id === id
+        (expense) => expense._id === id
       );
       state.expenses.splice(updatableExpenseIndex, 1);
     },

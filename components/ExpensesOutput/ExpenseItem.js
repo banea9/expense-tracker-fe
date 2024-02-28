@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate } from "../../util/date";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
+import { categories } from "../../util/constants";
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -56,6 +58,18 @@ const ExpenseItem = ({ expense }) => {
   const capitalizeWord = (word) => word.charAt(0).toUpperCase() + word.slice(1);
 
   const { category, subcategory, lastModified, amount } = expense;
+
+  const subcategoryLabel = useMemo(() => {
+    const allSubcategories = categories.map(
+      (category) => category.subcategories
+    );
+    const foundedSubcategory = allSubcategories
+    .flat()
+    .find((sub) => sub['value'] === subcategory);
+
+    return foundedSubcategory.label;
+  }, [subcategory]);
+
   return (
     <Pressable
       onPress={expensePressHandler}
@@ -64,7 +78,7 @@ const ExpenseItem = ({ expense }) => {
       <View style={styles.rootContainer}>
         <View>
           <Text style={[styles.textBase, styles.description]}>
-            {capitalizeWord(category)}, {capitalizeWord(subcategory)}
+            {capitalizeWord(category)}, {subcategoryLabel}
           </Text>
           <Text style={styles.textBase}>
             {getFormattedDate(lastModified)}, by {userState.username}

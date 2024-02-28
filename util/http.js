@@ -35,12 +35,14 @@ export const httpUpdateExpense = async (expenseData, token) => {
   return response.data;
 };
 
-export const httpDeleteExpense = (id, token) => {
-  return axios.delete(`${BACKEND_URL}/expenses/${id}/delete`, {
+export const httpDeleteExpense = async (id, token) => {
+  const response = await axios.delete(`${BACKEND_URL}/expenses/${id}/delete`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+
+  return response.data;
 };
 
 export const httpAddWallet = async (walletData, token) => {
