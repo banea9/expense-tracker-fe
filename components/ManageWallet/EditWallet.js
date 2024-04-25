@@ -11,7 +11,6 @@ import { GlobalStyles } from "../../constants/styles";
 import { useState } from "react";
 import {
   httpAddUserToWallet,
-  httpEditWallet,
   httpRemoveUserFromWallet,
   httpSetActiveWallet,
   httpUpdateWallet,
@@ -242,8 +241,9 @@ const EditWallet = ({ route, navigation }) => {
       isActive: inputValue.isActive.value,
     };
     try {
-      const id = await httpEditWallet(_id, walletData, user.token);
-      dispatch(updateWallet({ wallet: walletData, id }));
+      console.log('called', walletData)
+      const returnedWallet = await httpUpdateWallet(_id, walletData, user.token);
+      dispatch(updateWallet({ wallet: walletData, id: returnedWallet._id }));
       navigation.goBack();
     } catch (err) {
       setError("Could not save wallet. Please try again later");

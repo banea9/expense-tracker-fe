@@ -55,13 +55,13 @@ export const httpAddWallet = async (walletData, token) => {
   return response.data;
 };
 
-export const httpUpdateWallet = async (walletData, token) => {
-  // const response = await axios.post(`${BACKEND_URL}/wallets`, walletData, {
-  //   headers: {
-  //     Authorization: `Bearer ${token}`,
-  //   },
-  // });
-  // return response.data;
+export const httpUpdateWallet = async (id, walletData, token) => {
+  const response = await axios.patch(`${BACKEND_URL}/wallets/${id}`, walletData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 };
 
 export const httpFetchWallet = async (token) => {
@@ -124,16 +124,3 @@ export const httpSetActiveWallet = async (walletId, email, token) => {
   return response.data;
 };
 
-export const httpEditWallet = async (walletId, walletData, token) => {
-  const response = await axios.patch(
-    `${BACKEND_URL}/wallets/${walletId}`,
-    walletData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  return response.data;
-};
