@@ -1,13 +1,139 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
+import { useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { categories } from "../../util/constants";
 import Input from "./Input";
 import Button from "../../components/UI/Button";
-import { useState } from "react";
-import { getFormattedDate } from "../../util/date";
+import CustomPicker from "../UI/CustomPicker";
+import DatePickerInput from "../UI/DatePickerInput";
+
+const ExpenseForm = ({ onCancel, onSubmit, submitBtnLabel, defaultExpense }) => {
+  const [category, setCategory] = useState(defaultExpense?.category ?? "");
+  const [subcategory, setSubcategory] = useState(
+    defaultExpense?.subcategory ?? ""
+  );
+  const [amount, setAmount] = useState(
+    defaultExpense ? defaultExpense.amount.toString() : ""
+  );
+  const [date, setDate] = useState(
+    defaultExpense?.date ? new Date(defaultExpense.date) : new Date()
+  );
+  const [description, setDescription] = useState(
+    defaultExpense?.description ?? ""
+  );
+  const [errors, setErrors] = useState({});
+
+  const subcategoryOptions =
+    categories.find((c) => c.value === category)?.subcategories ?? [];
+
+  const handleCategoryChange = (value) => {
+    setCategory(value);
+    setSubcategory(""); // reset subcategory when category changes
+  };
+
+  const handleSubmit = () => {
+    const parsedAmount = parseFloat(amount);
+    const nextErrors = {
+      category: !category,
+      subcategory: !subcategory,
+      amount: isNaN(parsedAmount) || parsedAmount <= 0,
+      date: !(date instanceof Date) || isNaN(date.getTime()),
+    };
+    setErrors(nextErrors);
+
+    if (Object.values(nextErrors).some(Boolean)) {
+      Alert.alert("Invalid input", "Please check the values you entered.");
+      return;
+    }
+
+    onSubmit({
+      category,
+      subcategory,
+      amount: parsedAmount,
+      description: description.trim(),
+      date,
+    });
+  };
+
+  return (
+    <ScrollView
+      style={styles.form}
+      contentContainerStyle={styles.formContent}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Text style={styles.title}>Your Expense</Text>
+
+      <CustomPicker
+        options={categories}
+        category={category}
+        setCategory={handleCategoryChange}
+        subcategory={subcategory}
+        setSubcategory={setSubcategory}
+        invalid={errors.category}
+      >
+        Category
+      </CustomPicker>
+
+      <CustomPicker
+        options={subcategoryOptions}
+        category={category}
+        setCategory={handleCategoryChange}
+        subcategory={subcategory}
+        setSubcategory={setSubcategory}
+        invalid={errors.subcategory}
+      >
+        Subcategory
+      </CustomPicker>
+
+      <View style={styles.rowInputContainer}>
+        <Input
+          style={styles.rowInput}
+          invalid={errors.amount}
+          label="Amount"
+          textInputConfig={{
+            keyboardType: "decimal-pad",
+            onChangeText: setAmount,
+            value: amount,
+          }}
+        />
+        <DatePickerInput
+          style={styles.rowInput}
+          label="Date"
+          value={date}
+          onChange={setDate}
+          invalid={errors.date}
+        />
+      </View>
+
+      <Input
+        label="Description"
+        textInputConfig={{
+          multiline: true,
+          onChangeText: setDescription,
+          value: description,
+        }}
+      />
+
+      <View style={styles.buttonsContainer}>
+        <Button style={styles.button} mode="flat" onPress={onCancel}>
+          Cancel
+        </Button>
+        <Button style={styles.button} onPress={handleSubmit}>
+          {submitBtnLabel}
+        </Button>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default ExpenseForm;
 
 const styles = StyleSheet.create({
   form: {
-    marginTop: 40,
+    flex: 1,
+  },
+  formContent: {
+    paddingBottom: 24,
   },
   title: {
     marginVertical: 20,
@@ -19,13 +145,14 @@ const styles = StyleSheet.create({
   rowInputContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     width: "100%",
   },
   rowInput: {
     flex: 1,
   },
   buttonsContainer: {
+    marginTop: 16,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -34,128 +161,4 @@ const styles = StyleSheet.create({
     minWidth: 120,
     marginHorizontal: 8,
   },
-  errorMsg: {
-    color: GlobalStyles.colors.error500,
-    textAlign: "center",
-    marginVertical: 8,
-  },
 });
-
-const ExpenseForm = ({
-  onCancel,
-  onSubmit,
-  submitBtnLabel,
-  defaultExpense,
-}) => {
-  const [inputValue, setInputValue] = useState({
-    amount: {
-      value: defaultExpense ? defaultExpense.amount.toString() : "",
-      isValid: true,
-    },
-    date: {
-      value: defaultExpense ? getFormattedDate(defaultExpense.date) : "",
-      isValid: true,
-    },
-    description: {
-      value: defaultExpense ? defaultExpense.description : "",
-      isValid: true,
-    },
-  });
-
-  const inputChangeHandler = (inputIdentifier, value) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        [inputIdentifier]: { value, isValid: true },
-      };
-    });
-  };
-
-  const handleSubmit = () => {
-    const expenseData = {
-      amount: +inputValue.amount.value,
-      date: new Date(inputValue.date.value),
-      description: inputValue.description.value,
-    };
-
-    const amountIsValid =
-      !isNaN(expenseData?.amount) && expenseData?.amount > 0;
-    const descriptionIsValid = expenseData.description.trim().length > 0;
-    const dateIsValid = expenseData.date.toString() !== "Invalid Date";
-
-    if (!amountIsValid || !descriptionIsValid || !dateIsValid) {
-      Alert.alert("Invalid input", "Please check you input values");
-      setInputValue((prevState) => {
-        return {
-          amount: { value: prevState.amount.value, isValid: amountIsValid },
-          date: { value: prevState.date.value, isValid: dateIsValid },
-          description: {
-            value: prevState.description.value,
-            isValid: descriptionIsValid,
-          },
-        };
-      });
-      return;
-    }
-
-    onSubmit(expenseData);
-  };
-
-  const formIsInvalid = () =>
-    !inputValue.amount.isValid ||
-    !inputValue.date.isValid ||
-    !inputValue.description.isValid;
-
-  return (
-    <View style={styles.form}>
-      <Text style={styles.title}>Your Expense</Text>
-      <View style={styles.rowInputContainer}>
-        <Input
-          style={styles.rowInput}
-          invalid={!inputValue.amount.isValid}
-          label="Amount"
-          textInputConfig={{
-            keyboardType: "decimal-pad",
-            onChangeText: inputChangeHandler.bind(this, "amount"),
-            value: inputValue.amount.value,
-          }}
-        />
-        <Input
-          style={styles.rowInput}
-          invalid={!inputValue.date.isValid}
-          label="Date"
-          textInputConfig={{
-            placeholder: "YYYY-MM-DD",
-            maxLength: 10,
-            onChangeText: inputChangeHandler.bind(this, "date"),
-            value: inputValue.date.value,
-          }}
-        />
-      </View>
-      <Input
-        invalid={!inputValue.description.isValid}
-        label="Description"
-        textInputConfig={{
-          multiline: true,
-          onChangeText: inputChangeHandler.bind(this, "description"),
-          value: inputValue.description.value,
-        }}
-      />
-      {formIsInvalid() && (
-        <Text style={styles.errorMsg}>
-          Form is invalid - please check the entered data.
-        </Text>
-      )}
-      <View style={styles.buttonsContainer}>
-        <Button style={styles.button} mode="flat" onPress={onCancel}>
-          Cancel
-        </Button>
-        <Button style={styles.button} onPress={handleSubmit}>
-          {submitBtnLabel}
-        </Button>
-      </View>
-    </View>
-  );
-};
-
-export default ExpenseForm;

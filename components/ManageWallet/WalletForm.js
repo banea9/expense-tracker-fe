@@ -99,8 +99,8 @@ const WalletForm = ({ navigation }) => {
       description: inputValue.description.value,
     };
     try {
-      const id = await httpAddWallet(walletData, user.token);
-      dispatch(addWallet({ ...walletData, id }));
+      const created = await httpAddWallet(walletData, user.token);
+      dispatch(addWallet(created));
       navigation.goBack();
     } catch (err) {
       setError("Could not save wallet. Please try again later");

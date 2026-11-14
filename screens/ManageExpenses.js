@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalStyles } from "../constants/styles";
 import { deleteExpense, updateExpense, addExpense } from "../store/expenses";
@@ -13,55 +13,42 @@ import {
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 
-const styles = StyleSheet.create({
-  rootContainer: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: GlobalStyles.colors.primary700,
-  },
-  deletеBtn: {
-    marginTop: 16,
-    paddingTop: 8,
-    borderTopColor: GlobalStyles.colors.primary200,
-    borderTopWidth: 2,
-    alignItems: "center",
-  },
-});
-
 const ManageExpenses = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   const expenseId = route.params?.expenseId;
   const dispatch = useDispatch();
+  const { token, activeWallet } = useSelector((state) => state.authState);
 
   const selectedExpense = useSelector((state) =>
     state.expensesState.expenses.find((el) => el.id === expenseId)
   );
 
-  const cancelHandler = () => {
-    navigation.goBack();
-  };
+  const cancelHandler = () => navigation.goBack();
 
   const confirmHandler = async (expenseData) => {
+    if (!expenseId && !activeWallet) {
+      Alert.alert(
+        "No active wallet",
+        "Please select an active wallet before adding an expense."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       if (expenseId) {
-        dispatch(
-          updateExpense({
-            id: expenseId,
-            expense: expenseData,
-          })
-        );
-        await httpUpdateExpense(expenseId, expenseData);
+        const updated = await httpUpdateExpense(expenseId, expenseData, token);
+        dispatch(updateExpense({ id: expenseId, expense: updated }));
       } else {
-        const id = await httpStoreExpense(expenseData);
-        dispatch(addExpense({ ...expenseData, id }));
+        const created = await httpStoreExpense(expenseData, activeWallet, token);
+        dispatch(addExpense(created));
       }
       navigation.goBack();
     } catch (err) {
-      setError("Could not save expense. Please try again later");
-      setLoading(false)
+      setError("Could not save expense. Please try again later.");
+      setLoading(false);
     }
   };
 
@@ -74,11 +61,11 @@ const ManageExpenses = ({ route, navigation }) => {
   const deleteExpenseHandler = async () => {
     setLoading(true);
     try {
+      await httpDeleteExpense(expenseId, token);
       dispatch(deleteExpense({ id: expenseId }));
-      await httpDeleteExpense(expenseId);
       navigation.goBack();
     } catch (err) {
-      setError("Could not delete expense. Please try again later");
+      setError("Could not delete expense. Please try again later.");
       setLoading(false);
     }
   };
@@ -100,7 +87,7 @@ const ManageExpenses = ({ route, navigation }) => {
         defaultExpense={selectedExpense}
       />
       {expenseId && (
-        <View style={styles.deletеBtn}>
+        <View style={styles.deleteBtn}>
           <IconButton
             icon="trash"
             color={GlobalStyles.colors.error500}
@@ -114,3 +101,18 @@ const ManageExpenses = ({ route, navigation }) => {
 };
 
 export default ManageExpenses;
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: GlobalStyles.colors.primary700,
+  },
+  deleteBtn: {
+    marginTop: 16,
+    paddingTop: 8,
+    borderTopColor: GlobalStyles.colors.primary200,
+    borderTopWidth: 2,
+    alignItems: "center",
+  },
+});

@@ -2,21 +2,6 @@ import { View, StyleSheet, Text } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { Picker } from "@react-native-picker/picker";
 
-const styles = StyleSheet.create({
-  pickerContainer: {
-    margin: 4,
-  },
-  pickerLabel: {
-    fontSize: 12,
-    color: GlobalStyles.colors.white,
-    marginBottom: 4,
-  },
-  picker: {
-    backgroundColor: GlobalStyles.colors.primary800,
-    color: GlobalStyles.colors.white,
-  },
-});
-
 const CustomPicker = ({
   options,
   children,
@@ -24,18 +9,24 @@ const CustomPicker = ({
   setCategory,
   subcategory,
   setSubcategory,
+  invalid,
 }) => {
+  const isCategory = children === "Category";
+  const selectedValue = isCategory ? category : subcategory;
+  const onValueChange = (value) =>
+    isCategory ? setCategory(value) : setSubcategory(value);
 
   return (
     <View style={styles.pickerContainer}>
-      <View>
-        <Text style={styles.pickerLabel}>{children}</Text>
+      <Text style={[styles.pickerLabel, invalid && styles.invalidLabel]}>
+        {children}
+      </Text>
+      <View style={[styles.pickerWrapper, invalid && styles.invalidWrapper]}>
         <Picker
           style={styles.picker}
-          selectedValue={children === "Category" ? category : subcategory}
-          onValueChange={(value) =>
-            children === "Category" ? setCategory(value) : setSubcategory(value)
-          }
+          dropdownIconColor={GlobalStyles.colors.white}
+          selectedValue={selectedValue}
+          onValueChange={onValueChange}
         >
           <Picker.Item label={`Select ${children}`} value="" />
           {options?.map((o) => (
@@ -48,3 +39,30 @@ const CustomPicker = ({
 };
 
 export default CustomPicker;
+
+const styles = StyleSheet.create({
+  pickerContainer: {
+    marginHorizontal: 4,
+    marginVertical: 8,
+  },
+  pickerLabel: {
+    fontSize: 12,
+    color: GlobalStyles.colors.white,
+    marginBottom: 4,
+  },
+  invalidLabel: {
+    color: GlobalStyles.colors.error500,
+  },
+  pickerWrapper: {
+    backgroundColor: GlobalStyles.colors.primary800,
+    borderRadius: 6,
+    overflow: "hidden",
+  },
+  invalidWrapper: {
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.error500,
+  },
+  picker: {
+    color: GlobalStyles.colors.white,
+  },
+});

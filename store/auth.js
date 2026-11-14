@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const authSlice = createSlice({
   name: "auth",
@@ -13,20 +13,26 @@ const authSlice = createSlice({
   },
   reducers: {
     authenticate: (state, action) => {
-      AsyncStorage.setItem("auth-token", action.payload.token);
-      state.token = action.payload.token;
+      const { token } = action.payload;
+      let decoded = {};
+      try {
+        decoded = jwtDecode(token) ?? {};
+      } catch {
+        decoded = {};
+      }
+      state.token = token;
       state.isAuthenticated = true;
-      state.email = jwt_decode(action.payload.token)?.email;
-      state.username = jwt_decode(action.payload.token)?.username;
-      state.activeWallet = jwt_decode(action.payload.token)?.activeWallet._id;
+      state.email = decoded.email ?? "";
+      state.username = decoded.username ?? "";
+      // activeWallet may be a populated wallet object, an id, or null.
+      state.activeWallet = decoded.activeWallet?._id ?? decoded.activeWallet ?? "";
     },
-    logout: (state, _action) => {
+    logout: (state) => {
       state.token = "";
       state.isAuthenticated = false;
       state.email = "";
       state.username = "";
       state.activeWallet = "";
-      AsyncStorage.removeItem("auth-token");
     },
     setUserActiveWallet: (state, action) => {
       state.activeWallet = action.payload.walletId;
@@ -34,8 +40,17 @@ const authSlice = createSlice({
   },
 });
 
-export const authenticate = authSlice.actions.authenticate;
-export const logout = authSlice.actions.logout;
-export const setUserActiveWallet = authSlice.actions.setUserActiveWallet;
+export const { authenticate, logout, setUserActiveWallet } = authSlice.actions;
+
+// Thunks keep storage side-effects out of the reducers.
+export const logIn = (token) => async (dispatch) => {
+  await AsyncStorage.setItem("auth-token", token);
+  dispatch(authenticate({ token }));
+};
+
+export const logOut = () => async (dispatch) => {
+  await AsyncStorage.removeItem("auth-token");
+  dispatch(logout());
+};
 
 export default authSlice.reducer;

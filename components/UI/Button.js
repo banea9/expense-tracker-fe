@@ -3,28 +3,27 @@ import { GlobalStyles } from "../../constants/styles";
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    borderRadius: 4,
-    padding: 8,
-    backgroundColor: GlobalStyles.colors.primary400,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: GlobalStyles.colors.accent500,
     borderWidth: 1,
-    borderColor: GlobalStyles.colors.primary400,
+    borderColor: GlobalStyles.colors.accent500,
     borderRadius: 14,
   },
   flat: {
     backgroundColor: "transparent",
+    borderColor: "transparent",
   },
   text: {
     color: GlobalStyles.colors.white,
     textAlign: "center",
+    fontWeight: "600",
   },
   flatText: {
-    color: GlobalStyles.colors.white,
-    textAlign: "center",
+    color: GlobalStyles.colors.accent400,
   },
   pressed: {
     opacity: 0.75,
-    backgroundColor: GlobalStyles.colors.primary400,
-    borderRadius: 4,
   },
 });
 

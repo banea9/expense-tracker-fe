@@ -12,12 +12,12 @@ const styles = StyleSheet.create({
   },
   period: {
     fontSize: 14,
-    color: GlobalStyles.colors.primary400
+    color: GlobalStyles.colors.primary600
   },
   sum: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: GlobalStyles.colors.primary400
+    color: GlobalStyles.colors.primary600
   }
 });
 

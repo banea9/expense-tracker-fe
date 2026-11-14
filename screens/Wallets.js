@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalStyles } from "../constants/styles";
 import { setWallets } from "../store/wallets";
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 
 const Wallets = () => {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(true);
+  const [error, setError] = useState(null);
   const wallets = useSelector((state) => state.walletsState.wallets);
   const user = useSelector((state) => state.authState);
   const dispatch = useDispatch();
@@ -37,7 +37,6 @@ const Wallets = () => {
         dispatch(setWallets(wallets));
         setError(false);
       } catch (err) {
-        console.log(err);
         setError("Couldn't fetch wallets!");
       }
       setLoading(false);
