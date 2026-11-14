@@ -6,32 +6,26 @@ const expensesSlice = createSlice({
     expenses: [],
   },
   reducers: {
+    // Expects an already-normalized array (newest first), as returned by the http layer.
     setExpenses: (state, action) => {
-      state.expenses = action.payload.reverse();
+      state.expenses = action.payload;
     },
     addExpense: (state, action) => {
-      const { description, amount, date, id } = action.payload;
-      state.expenses.unshift({
-        id,
-        description,
-        amount,
-        date,
-      });
+      state.expenses.unshift(action.payload);
     },
     deleteExpense: (state, action) => {
       const id = action.payload.id;
-      const updatableExpenseIndex = state.expenses.findIndex(
-        (expense) => expense.id === id
-      );
-      state.expenses.splice(updatableExpenseIndex, 1);
+      state.expenses = state.expenses.filter((expense) => expense.id !== id);
     },
     updateExpense: (state, action) => {
       const id = action.payload.id;
-      const findedExpenseIndex = state.expenses.findIndex((e) => e.id === id);
-      state.expenses[findedExpenseIndex] = {
-        ...state.expenses[findedExpenseIndex],
-        ...action.payload.expense,
-      };
+      const index = state.expenses.findIndex((e) => e.id === id);
+      if (index !== -1) {
+        state.expenses[index] = {
+          ...state.expenses[index],
+          ...action.payload.expense,
+        };
+      }
     },
   },
 });

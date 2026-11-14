@@ -1,22 +1,26 @@
+import Constants from "expo-constants";
 import { GlobalStyles } from "../constants/styles";
 
-export const API_URL = "http://172.22.240.1:3000";
+// API base URL is configurable via app.json -> expo.extra.apiUrl so the same
+// build can point at localhost, a LAN IP, or a deployed backend.
+export const API_URL =
+  Constants.expoConfig?.extra?.apiUrl ?? "http://localhost:3000";
 
 export const radioButtonsOptions = [
   {
-    id: 1,
+    id: "add",
     label: "Add User",
     value: "add",
-    color: GlobalStyles.colors.primary400,
+    color: GlobalStyles.colors.accent500,
     labelStyle: {
       color: GlobalStyles.colors.white,
     },
   },
   {
-    id: 2,
+    id: "remove",
     label: "Remove User",
     value: "remove",
-    color: GlobalStyles.colors.primary400,
+    color: GlobalStyles.colors.accent500,
     labelStyle: {
       color: GlobalStyles.colors.white,
     },
@@ -24,7 +28,8 @@ export const radioButtonsOptions = [
 ];
 
 export const emailRegex =
-  /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/gm;
+  /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/;
+
 export const categories = [
   {
     label: "Apartment",
@@ -42,7 +47,7 @@ export const categories = [
     value: "car",
     subcategories: [
       { label: "Fuel", value: "fuel" },
-      { label: "Paige", value: "paige" },
+      { label: "Parking", value: "parking" },
       { label: "Repair", value: "repair" },
       { label: "Other", value: "other-car" },
     ],
@@ -52,7 +57,7 @@ export const categories = [
     value: "health",
     subcategories: [
       { label: "Drugstore", value: "drugstore" },
-      { label: "Farmacy", value: "farmacy" },
+      { label: "Pharmacy", value: "pharmacy" },
       { label: "Appointments", value: "appointments" },
       { label: "Sports", value: "sports" },
       { label: "Other", value: "other-health" },
@@ -63,22 +68,22 @@ export const categories = [
     value: "groceries",
     subcategories: [
       { label: "Supermarket", value: "supermarket" },
-      { label: "Farmers Market", value: "farmers market" },
-      { label: "Butcher's shop", value: "butcher's shop" },
-      { label: "Milk House", value: "milk house" },
+      { label: "Farmers Market", value: "farmers-market" },
+      { label: "Butcher's Shop", value: "butchers-shop" },
+      { label: "Dairy", value: "dairy" },
       { label: "Bakery", value: "bakery" },
       { label: "Other", value: "other-groceries" },
     ],
   },
   {
-    label: "Restorant",
-    value: "restorant",
+    label: "Restaurant",
+    value: "restaurant",
     subcategories: [
-      { label: "Restorant", value: "restorant" },
+      { label: "Restaurant", value: "restaurant" },
       { label: "Coffee Shop", value: "coffee-shop" },
       { label: "Bar", value: "bar" },
       { label: "Delivery", value: "delivery" },
-      { label: "Other", value: "other-groceries" },
+      { label: "Other", value: "other-restaurant" },
     ],
   },
   {
@@ -95,15 +100,15 @@ export const categories = [
     value: "travel",
     subcategories: [
       { label: "Travel", value: "travel" },
-      { label: "Other", value: "other-wardrobe" },
+      { label: "Other", value: "other-travel" },
     ],
   },
   {
     label: "Self Improvement",
-    value: "self improvement",
+    value: "self-improvement",
     subcategories: [
       { label: "Courses", value: "courses" },
-      { label: "Certificates", value: "Certificates" },
+      { label: "Certificates", value: "certificates" },
       { label: "Books", value: "books" },
       { label: "Other", value: "other-self-improvement" },
     ],
@@ -112,7 +117,7 @@ export const categories = [
     label: "Other",
     value: "other",
     subcategories: [
-      { label: "Paperworks", value: "paperworks" },
+      { label: "Paperwork", value: "paperwork" },
       { label: "Gifts", value: "gifts" },
       { label: "Other", value: "other" },
     ],

@@ -6,6 +6,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
+  Platform,
 } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { useState } from "react";
@@ -18,8 +19,7 @@ import {
 import { updateWallet, manipulateWalletUser } from "../../store/wallets";
 import { setUserActiveWallet } from "../../store/auth";
 import { useSelector, useDispatch } from "react-redux";
-import { emailRegex } from "../../util/constants";
-import { radioButtonsOptions } from "../../util/constants";
+import { emailRegex, radioButtonsOptions } from "../../util/constants";
 import Input from "../ManageExpense/Input";
 import Button from "../../components/UI/Button";
 import ErrorOverlay from "../UI/ErrorOverlay";
@@ -28,71 +28,8 @@ import RadioGroup from "react-native-radio-buttons-group";
 import { selectWalletUsers } from "../../store/selectors/selector";
 import Checkbox from "expo-checkbox";
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  form: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.primary700,
-    paddingTop: 20,
-  },
-  rowInputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  },
-  rowInput: {
-    flex: 1,
-  },
-  checkboxContainer: {
-    display: "flex",
-    flexDirection: "row",
-    width: "100%",
-    margin: 5,
-  },
-  checkbox: {
-    marginRight: 5,
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    color: GlobalStyles.colors.white,
-  },
-  addRemoveContainer: {
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-    marginVertical: 10,
-    marginHorizontal: 5,
-  },
-  buttonsContainer: {
-    marginTop: 10,
-    marginBottom: 30,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    color: GlobalStyles.colors.white,
-    minWidth: 120,
-    marginHorizontal: 8,
-  },
-  errorMsg: {
-    color: GlobalStyles.colors.error500,
-    textAlign: "center",
-    marginVertical: 8,
-  },
-  input: {
-    backgroundColor: GlobalStyles.colors.primary800,
-    padding: 6,
-    borderRadius: 6,
-    fontSize: 18,
-    color: GlobalStyles.colors.white,
-    width: "100%",
-    marginHorizontal: 10,
-  },
-});
+const errorMessage = (e) =>
+  e?.response?.data?.message ?? e?.message ?? "Something went wrong.";
 
 const EditWallet = ({ route, navigation }) => {
   const { _id, name, description } = route.params.wallet;
@@ -105,50 +42,42 @@ const EditWallet = ({ route, navigation }) => {
     name: { value: name || "", isValid: true },
     creatorEmail: { value: user.email, isValid: true },
     description: { value: description || "", isValid: true },
-    isActive: { value: user.activeWallet === _id || false, isValid: true },
+    isActive: { value: user.activeWallet === _id, isValid: true },
     newUser: { value: "", isValid: true },
   });
 
-  const [radioBtnId, setRadioBtnId] = useState(0);
+  // null = no add/remove action chosen; otherwise "add" | "remove".
+  const [radioBtnId, setRadioBtnId] = useState(null);
 
-  const onCancel = () => {
-    navigation.goBack();
-  };
+  const isCreator = user.email === inputValue.creatorEmail.value;
+
+  const onCancel = () => navigation.goBack();
 
   const inputChangeHandler = (inputIdentifier, value) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        [inputIdentifier]: { value, isValid: true },
-      };
-    });
+    setInputValue((prevState) => ({
+      ...prevState,
+      [inputIdentifier]: { value, isValid: true },
+    }));
   };
 
   const resetUserField = () => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        newUser: {
-          value: "",
-          isValid: true,
-        },
-      };
-    });
+    setInputValue((prevState) => ({
+      ...prevState,
+      newUser: { value: "", isValid: true },
+    }));
   };
 
   const setActiveWallet = async (value) => {
     inputChangeHandler("isActive", value);
     try {
-      const res = await httpSetActiveWallet(_id, user.email, user.token);
-      dispatch(setUserActiveWallet({ walletId: res._id }));
-      console.log('user.activeWallet after', user.activeWallet)
+      await httpSetActiveWallet(_id, user.email, user.token);
+      dispatch(setUserActiveWallet({ walletId: _id }));
     } catch (e) {
-      console.log(e.message);
-      setError(e.message);
+      setError(errorMessage(e));
     }
   };
 
-  const radioBtnChangeHandler = (value = 0) => {
+  const radioBtnChangeHandler = (value = null) => {
     setRadioBtnId(value);
     resetUserField();
   };
@@ -156,57 +85,25 @@ const EditWallet = ({ route, navigation }) => {
   const handleUser = async () => {
     const emailIsValid = emailRegex.test(inputValue.newUser.value);
     if (!emailIsValid) {
-      Alert.alert("Invalid input", "Please enter valid email.");
-      setInputValue((prevState) => {
-        return {
-          name: {
-            value: prevState.name.value,
-            isValid: prevState.name.isValid,
-          },
-          creatorEmail: {
-            value: prevState.creatorEmail.value,
-            isValid: prevState.creatorEmail.isValid,
-          },
-          isActive: {
-            value: prevState.isActive.value,
-            isValid: prevState.isActive.isValid,
-          },
-          description: {
-            value: prevState.description.value,
-            isValid: prevState.description.isValid,
-          },
-          newUser: {
-            value: prevState.newUser.value,
-            isValid: emailIsValid,
-          },
-        };
-      });
+      Alert.alert("Invalid input", "Please enter a valid email.");
+      setInputValue((prevState) => ({
+        ...prevState,
+        newUser: { value: prevState.newUser.value, isValid: false },
+      }));
       return;
     }
 
     setLoading(true);
-    const walletData = {
-      id: _id,
-      userEmail: inputValue.newUser.value,
-    };
+    const walletData = { id: _id, userEmail: inputValue.newUser.value };
     try {
-      if (radioBtnId === 1) {
-        const res = await httpAddUserToWallet(walletData, user.token);
-        if (res.status === 400) {
-          throw new Error(res.message);
-        }
-        dispatch(manipulateWalletUser({ wallet: res }));
-        radioBtnChangeHandler();
-      } else {
-        const res = await httpRemoveUserFromWallet(walletData, user.token);
-        if (res.status === 400) {
-          throw new Error(res.message);
-        }
-        dispatch(manipulateWalletUser({ wallet: res }));
-        radioBtnChangeHandler();
-      }
+      const updatedWallet =
+        radioBtnId === "add"
+          ? await httpAddUserToWallet(walletData, user.token)
+          : await httpRemoveUserFromWallet(walletData, user.token);
+      dispatch(manipulateWalletUser({ wallet: updatedWallet }));
+      radioBtnChangeHandler();
     } catch (e) {
-      setError(e.message);
+      setError(errorMessage(e));
     }
     setLoading(false);
   };
@@ -217,21 +114,16 @@ const EditWallet = ({ route, navigation }) => {
     if (!nameIsValid || !descriptionIsValid) {
       Alert.alert(
         "Invalid input",
-        "Name should be longer then 3 characters and description should be more then 10 characters."
+        "Name should be longer than 3 characters and description should be more than 10 characters."
       );
-      setInputValue((prevState) => {
-        return {
-          name: { value: prevState.name.value, isValid: nameIsValid },
-          description: {
-            value: prevState.description.value,
-            isValid: descriptionIsValid,
-          },
-          newUser: {
-            value: prevState.newUser.value,
-            isValid: emailIsValid,
-          },
-        };
-      });
+      setInputValue((prevState) => ({
+        ...prevState,
+        name: { value: prevState.name.value, isValid: nameIsValid },
+        description: {
+          value: prevState.description.value,
+          isValid: descriptionIsValid,
+        },
+      }));
       return;
     }
 
@@ -239,17 +131,19 @@ const EditWallet = ({ route, navigation }) => {
     const walletData = {
       name: inputValue.name.value,
       description: inputValue.description.value,
+      creatorEmail: inputValue.creatorEmail.value,
       isActive: inputValue.isActive.value,
     };
     try {
-      const id = await httpUpdateWallet(walletData, user.token);
-      dispatch(updateWallet({ ...walletData, id }));
+      const updatedWallet = await httpUpdateWallet(_id, walletData, user.token);
+      dispatch(updateWallet({ wallet: updatedWallet }));
       navigation.goBack();
     } catch (err) {
-      setError("Could not save wallet. Please try again later");
+      setError(errorMessage(err));
       setLoading(false);
     }
   };
+
   if (error && !loading) {
     return <ErrorOverlay message={error} />;
   }
@@ -259,9 +153,12 @@ const EditWallet = ({ route, navigation }) => {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.screen} behavior="padding">
+    <KeyboardAvoidingView
+      style={styles.screen}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <View style={styles.form}>
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="handled">
           <View style={styles.rowInputContainer}>
             <Input
               style={styles.rowInput}
@@ -270,6 +167,7 @@ const EditWallet = ({ route, navigation }) => {
               textInputConfig={{
                 onChangeText: inputChangeHandler.bind(this, "name"),
                 value: inputValue.name.value,
+                editable: isCreator,
               }}
             />
             <Input
@@ -288,6 +186,7 @@ const EditWallet = ({ route, navigation }) => {
               multiline: true,
               onChangeText: inputChangeHandler.bind(this, "description"),
               value: inputValue.description.value,
+              editable: isCreator,
             }}
           />
           <Input
@@ -304,54 +203,57 @@ const EditWallet = ({ route, navigation }) => {
               onValueChange={setActiveWallet}
               color={
                 inputValue.isActive.value
-                  ? GlobalStyles.colors.primary400
+                  ? GlobalStyles.colors.accent500
                   : undefined
               }
             />
             <Text style={styles.checkboxLabel}>Active Wallet</Text>
           </View>
-          <RadioGroup
-            containerStyle={{ marginHorizontal: -5 }}
-            layout="row"
-            color={GlobalStyles.colors.primary400}
-            radioButtons={radioButtonsOptions}
-            onPress={radioBtnChangeHandler}
-            selectedId={radioBtnId}
-          />
-          {radioBtnId !== 0 && (
+          {isCreator && (
+            <RadioGroup
+              containerStyle={{ marginHorizontal: -5 }}
+              layout="row"
+              radioButtons={radioButtonsOptions}
+              onPress={radioBtnChangeHandler}
+              selectedId={radioBtnId}
+            />
+          )}
+          {radioBtnId && (
             <View style={styles.addRemoveContainer}>
               <TextInput
                 style={styles.input}
-                invalid={!inputValue.newUser.isValid}
                 placeholder="Enter user email"
                 onChangeText={inputChangeHandler.bind(this, "newUser")}
                 value={inputValue.newUser.value}
                 placeholderTextColor={GlobalStyles.colors.gray300}
+                autoCapitalize="none"
+                keyboardType="email-address"
               />
               <View style={styles.buttonsContainer}>
                 <Button
                   style={styles.button}
                   mode="flat"
-                  onPress={() => radioBtnChangeHandler(0)}
+                  onPress={() => radioBtnChangeHandler()}
                 >
                   Cancel
                 </Button>
                 <Button style={styles.button} onPress={handleUser}>
-                  {radioBtnId === 1 ? "Add User" : "Remove User"}
+                  {radioBtnId === "add" ? "Add User" : "Remove User"}
                 </Button>
               </View>
             </View>
           )}
         </ScrollView>
-        <View style={{ flex: 1 }} />
-        {radioBtnId === 0 && (
+        {!radioBtnId && (
           <View style={styles.buttonsContainer}>
             <Button style={styles.button} mode="flat" onPress={onCancel}>
               Cancel
             </Button>
-            <Button style={styles.button} onPress={handleSubmit}>
-              Save
-            </Button>
+            {isCreator && (
+              <Button style={styles.button} onPress={handleSubmit}>
+                Save
+              </Button>
+            )}
           </View>
         )}
       </View>
@@ -360,3 +262,57 @@ const EditWallet = ({ route, navigation }) => {
 };
 
 export default EditWallet;
+
+const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  form: {
+    flex: 1,
+    backgroundColor: GlobalStyles.colors.primary700,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  rowInputContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+  rowInput: { flex: 1 },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 10,
+    marginHorizontal: 8,
+  },
+  checkbox: { marginRight: 8 },
+  checkboxLabel: {
+    fontSize: 14,
+    color: GlobalStyles.colors.white,
+  },
+  addRemoveContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginVertical: 10,
+    paddingHorizontal: 8,
+  },
+  buttonsContainer: {
+    marginTop: 10,
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  button: {
+    minWidth: 120,
+    marginHorizontal: 8,
+  },
+  input: {
+    backgroundColor: GlobalStyles.colors.primary800,
+    padding: 10,
+    borderRadius: 6,
+    fontSize: 18,
+    color: GlobalStyles.colors.white,
+    width: "100%",
+  },
+});

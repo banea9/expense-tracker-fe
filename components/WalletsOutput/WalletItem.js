@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
   },
   activeWallet: {
-    borderColor: GlobalStyles.colors.primary400,
+    borderColor: GlobalStyles.colors.accent500,
     borderWidth: 5,
   },
   nameContainer: {

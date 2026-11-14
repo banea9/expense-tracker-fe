@@ -80,7 +80,6 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           <AuthInput
             label="Username"
             onUpdateValue={updateInputValueHandler.bind(this, "username")}
-            secure
             value={enteredUsername}
             isInvalid={usernameIsInvalid}
             placeholder='Username'

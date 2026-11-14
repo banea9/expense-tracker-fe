@@ -11,37 +11,28 @@ const walletsSlice = createSlice({
       state.wallets = wallets.reverse();
     },
     addWallet: (state, action) => {
-      const { description, name, id } = action.payload;
-      state.wallets.unshift({
-        description,
-        name,
-        id,
-      });
+      state.wallets.unshift(action.payload);
     },
     deleteWallet: (state, action) => {
       const id = action.payload.id;
-      const updatablewalletIndex = state.wallets.findIndex(
-        (wallet) => wallet.id === id
-      );
-      state.wallets.splice(updatablewalletIndex, 1);
+      state.wallets = state.wallets.filter((wallet) => wallet._id !== id);
     },
     updateWallet: (state, action) => {
-      const id = action.payload.id;
-      const findedwalletIndex = state.wallets.findIndex((e) => e.id === id);
-      state.wallets[findedwalletIndex] = {
-        ...state.wallets[findedwalletIndex],
-        ...action.payload.wallet,
-      };
+      const updated = action.payload.wallet;
+      const index = state.wallets.findIndex((w) => w._id === updated._id);
+      if (index !== -1) {
+        state.wallets[index] = { ...state.wallets[index], ...updated };
+      }
     },
     manipulateWalletUser: (state, action) => {
-      const id = action.payload.wallet._id;
-      const findedwalletIndex = state.wallets.findIndex((e) => e._id === id);
-      const walletUsers = action.payload.wallet?.users;
-      walletUsers;
-      state.wallets[findedwalletIndex] = {
-        ...state.wallets[findedwalletIndex],
-        users: walletUsers,
-      };
+      const updated = action.payload.wallet;
+      const index = state.wallets.findIndex((w) => w._id === updated._id);
+      if (index !== -1) {
+        state.wallets[index] = {
+          ...state.wallets[index],
+          users: updated.users,
+        };
+      }
     },
   },
 });

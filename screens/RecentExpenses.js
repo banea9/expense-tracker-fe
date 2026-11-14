@@ -5,41 +5,39 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import { setExpenses } from "../store/expenses";
 import { getDateMinusDays } from "../util/date";
-import { httpFetchExpense } from "../util/http";
+import { httpFetchAllExpenses } from "../util/http";
 
 const RecentExpenses = () => {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(true);
+  const [error, setError] = useState(null);
   const expenses = useSelector((state) => state.expensesState.expenses);
+  const token = useSelector((state) => state.authState.token);
   const dispatch = useDispatch();
+
   useEffect(() => {
-    const getExenses = async () => {
+    const getExpenses = async () => {
       try {
-        const expenses = await httpFetchExpense();
-        dispatch(setExpenses(expenses));
+        const fetched = await httpFetchAllExpenses(token);
+        dispatch(setExpenses(fetched));
       } catch (err) {
         setError("Couldn't fetch expenses!");
       }
       setLoading(false);
     };
-
-    getExenses();
-  }, []);
-
+    getExpenses();
+  }, [dispatch, token]);
 
   if (error && !loading) {
-    return <ErrorOverlay message={error}/>;
+    return <ErrorOverlay message={error} />;
   }
 
   if (loading) {
     return <LoadingOverlay />;
   }
 
-  const recentExpenses = expenses?.filter((e) => {
-    const today = new Date();
-    const date7DaysAgo = getDateMinusDays(today, 7);
-    return e.date > date7DaysAgo;
-  });
+  const date7DaysAgo = getDateMinusDays(new Date(), 7);
+  const recentExpenses = expenses?.filter((e) => new Date(e.date) > date7DaysAgo);
+
   return (
     <ExpensesOutput
       expenses={recentExpenses}
